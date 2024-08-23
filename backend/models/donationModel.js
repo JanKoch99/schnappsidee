@@ -4,18 +4,30 @@ const Schema = mongoose.Schema
 
 const donationSchema = new Schema({
     id: {
+        type: Number,
+        required: true
+    },
+    victim: {
+        type: Number,
+        required: true
+    },
+    task: {
         type: String,
         required: true
     },
-    to: {
-        type: Number,
-        required: true
-    },
-    what: {
-        type: Number,
-        required: true
-    },
     drink: {
+        type: String,
+        required: true
+    },
+    perpetrator: {
+        type: String,
+        required: false
+    },
+    contactInfo: {
+        type: String,
+        required: true
+    },
+    taskState: {
         type: String,
         required: true
     }

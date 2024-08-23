@@ -1,5 +1,5 @@
 const express = require('express')
-const Workout = require('../models/workoutModel')
+const Donation = require('../models/donationModel')
 const {createDonation, getDonations, getDonation, deleteDonation, updateDonation} = require("../controllers/donationController");
 
 const router = express.Router()
