@@ -6,7 +6,7 @@ const getDonations = async (req,res) => {
     const donations = await Donation.find().populate("challengeID").sort({createdAt: -1})
     const formattedDonations = donations.map((donation) => (
         {
-            id: donation._id,
+            _id: donation._id,
             victim: donation.victim,
             task: donation.challengeID.task,
             drink: donation.drink,
@@ -32,7 +32,7 @@ const getDonation = async (req,res) => {
         return res.status(404).json({error: 'No such donation'})
     }
     const formattedDonation = {
-            id: donation._id,
+            _id: donation._id,
             victim: donation.victim,
             task: donation.challengeID.task,
             drink: donation.drink,
@@ -121,7 +121,7 @@ const updateDonation = async (req,res) =>{
     }
 
     const formattedDonation = {
-        id: donation._id,
+        _id: donation._id,
         victim: donation.victim,
         task: donation.challengeID.task,
         drink: donation.drink,
