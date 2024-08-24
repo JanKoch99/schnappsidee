@@ -3,8 +3,20 @@ const mongoose = require('mongoose')
 const axios = require("axios");
 // get all workouts
 const getDonations = async (req,res) => {
-    const donations = await Donation.find().sort({createdAt: -1})
-    res.status(200).json(donations)
+    const donations = await Donation.find().populate("challengeID").sort({createdAt: -1})
+    const formattedDonations = donations.map((donation) => (
+        {
+            id: donation._id,
+            victim: donation.victim,
+            task: donation.challengeID.task,
+            drink: donation.drink,
+            perpetrator: donation.perpetrator,
+            contactInfo: donation.contactInfo,
+            taskState: donation.taskState,
+            victimName: donation.victimName,
+            difficulty: donation.challengeID.difficulty,
+        }))
+    res.status(200).json(formattedDonations)
 }
 // get a single donation
 const getDonation = async (req,res) => {
@@ -14,23 +26,36 @@ const getDonation = async (req,res) => {
         return res.status(404).json({error: ' No such donation'})
     }
 
-    const donation = await Donation.findById(id)
+    const donation = await Donation.findById(id).populate("challengeID")
 
     if (!donation) {
         return res.status(404).json({error: 'No such donation'})
     }
-    res.status(200).json(donation)
+    const formattedDonation = {
+            id: donation._id,
+            victim: donation.victim,
+            task: donation.challengeID.task,
+            drink: donation.drink,
+            perpetrator: donation.perpetrator,
+            contactInfo: donation.contactInfo,
+            taskState: donation.taskState,
+            victimName: donation.victimName,
+            difficulty: donation.challengeID.difficulty,
+        }
+
+    res.status(200).json(formattedDonation)
 }
 // create new donation
 const createDonation = async (req, res) => {
-    let {victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
+    let {victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName} = req.body
+
     let emptyFields = []
 
     if(!victim) {
         emptyFields.push('victim')
     }
-    if(!task) {
-        emptyFields.push('task')
+    if(!challengeID) {
+        emptyFields.push('challengeID')
     }
     if(!drink) {
         emptyFields.push('drink')
@@ -47,15 +72,12 @@ const createDonation = async (req, res) => {
     if(!victimName) {
         emptyFields.push('victimName')
     }
-    if(!difficulty) {
-        emptyFields.push('difficulty')
-    }
     if(emptyFields.length > 0){
         return res.status(400).json({ error: "Please fill in all the fields", emptyFields })
     }
     //add doc to db
     try {
-        const donation = await  Donation.create({victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty});
+        const donation = await  Donation.create({victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName});
         res.status(200).json(donation)
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -65,7 +87,6 @@ const createDonation = async (req, res) => {
 // delete a donation
 const deleteDonation = async (req,res) => {
     const id = req.params.id
-    const {victim, task, drink,perpetrator, contactInfo, taskState} = req.body
     if (!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: ' No such donation'})
     }
@@ -80,22 +101,37 @@ const deleteDonation = async (req,res) => {
 // update a donation
 const updateDonation = async (req,res) =>{
     const id = req.params.id
-    let {victim, task, drink,perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
+    let {victim, challengeID, drink,perpetrator, contactInfo, taskState, victimName} = req.body
 
 
     if (!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: ' No such donation'})
     }
 
+    if(!perpetrator) {
+        perpetrator = "Anonymous"
+    }
 
     const donation = await Donation.findOneAndUpdate({_id: id}, {
-        victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty
-    })
+        victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName
+    }).populate("challengeID")
+    console.log(perpetrator)
     if (!donation) {
         return res.status(404).json({error: 'No such donation'})
     }
 
-    if(taskState == 'inProgress'){
+    const formattedDonation = {
+        id: donation._id,
+        victim: donation.victim,
+        task: donation.challengeID.task,
+        drink: donation.drink,
+        perpetrator: donation.perpetrator,
+        contactInfo: donation.contactInfo,
+        taskState: donation.taskState,
+        victimName: donation.victimName,
+        difficulty: donation.challengeID.difficulty,
+    }
+    if(taskState === 'inProgress'){
 
         try {
             const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
@@ -130,7 +166,7 @@ const updateDonation = async (req,res) =>{
     }
 
 
-    res.status(200).json(donation)
+    res.status(200).json(formattedDonation)
 }
 
 
