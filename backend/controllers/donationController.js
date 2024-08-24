@@ -1,5 +1,6 @@
 const Donation = require('../models/donationModel')
 const mongoose = require('mongoose')
+const axios = require("axios");
 // get all workouts
 const getDonations = async (req,res) => {
     const donations = await Donation.find().sort({createdAt: -1})
@@ -23,7 +24,7 @@ const getDonation = async (req,res) => {
 }
 // create new donation
 const createDonation = async (req, res) => {
-    const {victim, task, drink,perpetrator, contactInfo, taskState} = req.body
+    const {victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
     let emptyFields = []
 
     if(!victim) {
@@ -44,12 +45,18 @@ const createDonation = async (req, res) => {
     if(!taskState) {
         emptyFields.push('taskState')
     }
+    if(!victimName) {
+        emptyFields.push('victimName')
+    }
+    if(!difficulty) {
+        emptyFields.push('difficulty')
+    }
     if(emptyFields.length > 0){
         return res.status(400).json({ error: "Please fill in all the fields", emptyFields })
     }
     //add doc to db
     try {
-        const donation = await  Donation.create({victim, task, drink, perpetrator, contactInfo, taskState});
+        const donation = await  Donation.create({victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty});
         res.status(200).json(donation)
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -74,7 +81,7 @@ const deleteDonation = async (req,res) => {
 // update a donation
 const updateDonation = async (req,res) =>{
     const id = req.params.id
-    const {victim, task, drink,perpetrator, contactInfo, taskState} = req.body
+    let {victim, task, drink,perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
 
 
     if (!mongoose.Types.ObjectId.isValid(id)){
@@ -83,16 +90,50 @@ const updateDonation = async (req,res) =>{
 
 
     const donation = await Donation.findOneAndUpdate({_id: id}, {
-        victim, task, drink, perpetrator, contactInfo, taskState
+        victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty
     })
-
-    if(taskState == 'inProgress'){
-        //TODO versand per slack odr sms
-        }
-
     if (!donation) {
         return res.status(404).json({error: 'No such donation'})
     }
+
+    if(taskState == 'inProgress'){
+
+        try {
+            const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
+            const slackApiToken = process.env.SLACK_API_TOKEN;
+
+            const response = await axios.get(slackApiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${slackApiToken}`
+                }
+            })
+
+            if (!response.data.ok) {
+                return res.status(400).send(response.data)
+            }
+            if (!perpetrator){
+                perpetrator= 'Anonymus'
+            }
+            const userID = response.data.user.id
+            await axios.post(process.env.WEBHOOK, {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `Hey <@${userID}>,\nyou have been offered a drink by ${perpetrator}. Earn your drink now by simply completing a challenge at <https://veracalma.ch/|VeraCalma> at the <https://maps.app.goo.gl/M6paQkdfdJ1EE9Y77|following address>.`
+                        }
+                    },
+                ]
+            });
+
+        } catch (error) {
+                console.error('Error sending message:', error);
+                res.status(500).send('Internal Server Error');
+        }
+    }
+
+
     res.status(200).json(donation)
 }
 

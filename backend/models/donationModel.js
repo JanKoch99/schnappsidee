@@ -27,6 +27,14 @@ const donationSchema = new Schema({
     taskState: {
         type: String,
         required: true
+    },
+    victimName: {
+        type: String,
+        required: false
+    },
+    difficulty: {
+        type: Number,
+        required: true
     }
 }, { timestamps: true })
 
