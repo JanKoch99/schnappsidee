@@ -3,8 +3,10 @@ import Spinner from "@/components/spinner";
 import { useDonationStore } from "@/stores/donation";
 import { QueryFunction, useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import {config} from "@/Constants.js.ts";
 import axios from "axios";
 
+const URL: string = config.url;
 export const Route = createLazyFileRoute("/challenge")({
   component: ChallengeRoute,
 });
@@ -19,7 +21,7 @@ export type Challenge = {
 
 const fetchChallenges: QueryFunction<Challenge[], string[], never> = () =>
   axios
-    .get(`http://localhost:4000/api/challenges/`)
+    .get(`${URL}/api/challenges/`)
     // add a delay to simulate network latency
     .then(
       (response) =>
