@@ -67,122 +67,143 @@
     @apply bg-background text-foreground;
   }
 }
-/* Custom CSS for random bubbles, confined to the progress bar */
-.beer-fill {
-  background-color: #f4c542; /* Beer color */
-  height: 100%;
-  width: 75%; /* Adjust the width to represent progress */
-  overflow: hidden;
-  border-radius: 0.5rem;
-  position: relative;
-  display: flex; /* Use flex for aligning icon */
-  align-items: center;
-  justify-content: flex-end; /* Push content to the end */
-  padding-right: 12px; /* Add padding for spacing */
+
+.wave {
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  fill: #f1c40f;
 }
 
 .bubbles {
   position: absolute;
-  bottom: 0;
+  top: 0;
+  left: 0;
   width: 100%;
   height: 100%;
   background-image: radial-gradient(
-      circle at 20% 80%,
-      rgba(255, 255, 255, 0.8) 2%,
-      transparent 5%
+      circle at 10% 20%,
+      rgba(255, 255, 255, 0.5) 4%,
+      transparent 4%
     ),
     radial-gradient(
-      circle at 30% 60%,
-      rgba(255, 255, 255, 0.7) 3%,
-      transparent 6%
-    ),
-    radial-gradient(
-      circle at 70% 20%,
-      rgba(255, 255, 255, 0.6) 2.5%,
-      transparent 7%
-    ),
-    radial-gradient(
-      circle at 50% 40%,
+      circle at 40% 80%,
       rgba(255, 255, 255, 0.5) 3%,
-      transparent 8%
+      transparent 3%
+    ),
+    radial-gradient(
+      circle at 60% 30%,
+      rgba(255, 255, 255, 0.5) 3%,
+      transparent 3%
     ),
     radial-gradient(
       circle at 80% 50%,
-      rgba(255, 255, 255, 0.4) 2.5%,
+      rgba(255, 255, 255, 0.5) 5%,
       transparent 5%
+    ),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.5) 4%,
+      transparent 4%
+    ),
+    radial-gradient(
+      circle at 90% 10%,
+      rgba(255, 255, 255, 0.5) 3%,
+      transparent 3%
     );
-  background-size: 150px 150px; /* Proper bubble size */
-  background-repeat: repeat;
-  opacity: 0.7;
-  animation: bubble-animation 60s infinite; /* Default animation speed */
+  background-size: 10% 10%;
+  animation: bubbleAnimation 15s infinite;
+  opacity: 0.6;
+  z-index: 1;
 }
 
-@keyframes bubble-animation {
+.beer {
+  top: calc(30% + 32px);
+}
+
+.bubble {
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: bubbleFloat 5s infinite;
+  z-index: 3;
+  opacity: 0.7;
+}
+
+.bubble:nth-child(1) {
+  left: 10%;
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(2) {
+  left: 25%;
+  animation-duration: 8s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(3) {
+  left: 40%;
+  animation-duration: 7s;
+  animation-delay: 3s;
+}
+
+.bubble:nth-child(4) {
+  left: 55%;
+  animation-duration: 9s;
+  animation-delay: 4s;
+}
+
+.bubble:nth-child(5) {
+  left: 70%;
+  animation-duration: 6.5s;
+  animation-delay: 2.5s;
+}
+
+.bubble:nth-child(6) {
+  left: 85%;
+  animation-duration: 7.5s;
+  animation-delay: 3.5s;
+}
+
+@keyframes bubbleAnimation {
   0% {
     background-position: 0% 100%;
   }
-  25% {
-    background-position: 20% 80%;
-  }
   50% {
-    background-position: 50% 50%;
-  }
-  75% {
-    background-position: 80% 30%;
+    background-position: 100% 0%;
   }
   100% {
-    background-position: 0% 0%;
+    background-position: 0% 100%;
   }
 }
 
-.bubble-1 {
-  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.bubble-2 {
-  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
-  animation-duration: 42s; /* Slightly slower animation for variety */
-}
-
-.bubble-3 {
-  animation-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
-  animation-duration: 54s; /* Slightly slower animation for variety */
-}
-
-.bubble-4 {
-  animation-timing-function: cubic-bezier(0.7, 0.2, 0.1, 1);
-  animation-duration: 31s; /* Slightly slower animation for variety */
-}
-
-/* Media query for slower animation on mobile devices */
-@media (max-width: 768px) {
-  .bubbles {
-    animation-duration: 20s; /* Slower animation on mobile */
+@keyframes waveAnimation {
+  0% {
+    transform: scale(2) translateY(0);
   }
-  .bubble-2 {
-    animation-duration: 24s;
+  50% {
+    transform: scale(2) translateY(10px);
   }
-  .bubble-3 {
-    animation-duration: 28s;
-  }
-  .bubble-4 {
-    animation-duration: 22s;
+  100% {
+    transform: scale(2) translateY(0);
   }
 }
 
-/* Style for the beer icon at the end */
-.beer-icon-container {
-  width: 65px;
-  height: 65px;
-  background-color: #f4c542; /* Adjust background for more contrast */
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
-  margin-left: 10px; /* Space between icon and beer fill */
-}
-
-.beer-icon {
-  font-size: 28px; /* Increase icon size */
+@keyframes bubbleFloat {
+  0% {
+    bottom: 0;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    bottom: 100%;
+    transform: translateY(-100px) scale(1);
+  }
 }

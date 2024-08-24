@@ -11,17 +11,29 @@ import {
 import { Input } from "@/components/ui/input";
 import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMutation } from "@tanstack/react-query";
+import { createLazyFileRoute } from "@tanstack/react-router";
+import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
-export const Route = createLazyFileRoute("/perpetrator")({
-  component: PerpetratorRoute,
+export const Route = createLazyFileRoute("/payment")({
+  component: PaymentRoute,
 });
 
-function PerpetratorRoute() {
-  const navigate = useNavigate();
-  const { perpetrator, victim, setPerpetrator } = useDonationStore();
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const CreateDonationRequestBodySchema = z.object({
+  victim: z.string().email(),
+  challengeID: z.string().length(24),
+  drink: z.string().min(3),
+  perpetrator: z.string(),
+  contactInfo: z.string().email(),
+  taskState: z.enum(["open"]),
+  victimName: z.string().min(3),
+});
+
+function PaymentRoute() {
+  const { perpetrator, victim, drink, challenge } = useDonationStore();
   const form = useForm<z.infer<typeof PersonSchema>>({
     resolver: zodResolver(PersonSchema),
     defaultValues: {
@@ -30,15 +42,32 @@ function PerpetratorRoute() {
     },
   });
 
+  const mutation = useMutation({
+    mutationFn: (donation: z.infer<typeof CreateDonationRequestBodySchema>) => {
+      return axios.post("/donations", donation);
+    },
+  });
+
+  if (mutation.isPending) {
+    return <span>Submitting...</span>;
+  }
+
+  if (mutation.isSuccess) {
+    return <span>Submitted!</span>;
+  }
+
+  if (mutation.isError) {
+    return <span>Error: {mutation.error.message}</span>;
+  }
+
   return (
     <div className="mx-auto max-w-2xl text-center">
       <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
         <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Who is the perpetrator?
+          Time to pay!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          We need some information about you to send the challenge to{" "}
-          {victim.name}.
+          Did you really think we would let you get away with it for free?
         </p>
       </div>
 
@@ -48,8 +77,15 @@ function PerpetratorRoute() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((values) => {
-                setPerpetrator(values);
-                navigate({ to: "/payment" });
+                mutation.mutate({
+                  drink,
+                  challengeID: challenge,
+                  contactInfo: values.email,
+                  perpetrator: values.name,
+                  taskState: "open",
+                  victim: victim.email,
+                  victimName: victim.name,
+                });
               })}
               className="w-full space-y-6"
             >

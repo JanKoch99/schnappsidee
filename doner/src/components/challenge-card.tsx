@@ -1,16 +1,13 @@
 import { Card } from "@/components/ui/card";
 import { Challenge } from "@/routes/challenge.lazy";
 import { useDonationStore } from "@/stores/donation";
+import { useNavigate } from "@tanstack/react-router";
 import clsx from "clsx";
 import React from "react";
 
-const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
-  _id,
-  task,
-  difficulty,
-  active,
-}) => {
-  const { setChallenge, challenge } = useDonationStore();
+const ChallengeCard: React.FC<Challenge> = ({ _id, task, difficulty }) => {
+  const navigate = useNavigate();
+  const { setChallenge } = useDonationStore();
 
   const colors = {
     2: "bg-red-100 border-2 border-red-500",
@@ -20,11 +17,13 @@ const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
 
   return (
     <Card
-      onClick={() => setChallenge(_id)}
+      onClick={() => {
+        setChallenge(_id);
+        navigate({ to: "/perpetrator" });
+      }}
       className={clsx(
-        "w-full h-full p-5 hover:scale-105 hover:cursor-pointer transition-all",
-        colors[difficulty],
-        !active && _id !== challenge ? "opacity-25" : ""
+        "w-full h-full p-5 hover:cursor-pointer transition-all",
+        colors[difficulty]
       )}
     >
       <h2 className="font-bold">{task}</h2>
