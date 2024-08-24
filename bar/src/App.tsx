@@ -4,7 +4,8 @@ import {useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleCheck, faCircleXmark, faDumbbell} from "@fortawesome/free-solid-svg-icons";
 import {
-    Dialog, DialogClose,
+    Dialog,
+    DialogClose,
     DialogContent,
     DialogFooter,
     DialogHeader,
@@ -76,8 +77,8 @@ function App() {
     const eventSource = new EventSource(`${URL}/events`);
     eventSource.onmessage = function (event) {
         const newDonation = JSON.parse(event.data);
-        const donationArray: Donation[] = [...openDonations, newDonation].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
-        setOpenDonations(donationArray);
+        const donationArray: Donation[] = [...donations, newDonation]
+        setDonations(donationArray);
         triggerConfetti("");
     }
 
@@ -112,7 +113,12 @@ function App() {
   }
 
   const abortInProgress = async (donation: Donation) => {
-      await chickenSound.play();
+      try {
+          await chickenSound.play();
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      } catch (ignored) {
+          console.log("For sound you need to click in the application");
+      }
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setAbortDonations(abortDonations.concat(donation));
       await updateDonation(donation, "chicken");
@@ -197,18 +203,52 @@ function App() {
         })();
     };
 
-  const checkForExpiredTimer = async () => {
-      const now = new Date();
-      for (const donation of donations) {
+    const getRemainingTime = (donation: Donation): number => {
+        const now = new Date();
         const updatedAt = new Date(donation.updatedAt);
-        const remainingTime = Math.max(0, 60 - ((now.getTime() - updatedAt.getTime()) / 1000 / 60));
-        if (remainingTime <= 0) {
-            if (donation.taskState === "open") {
-                await abortOpen(donation);
-            } else {
-                await abortInProgress(donation);
-            }
-        }
+        return Math.max(0, 60 - ((now.getTime() - updatedAt.getTime()) / 1000 / 60));
+    }
+
+  const abortOpens = async (donationsToRemove: Donation[]) => {
+      setOpenDonations(openDonations.filter(openDonation => !donationsToRemove.includes(openDonation)));
+      for (const donation of donationsToRemove) {
+          await fetch(`${URL}/api/donations/${donation._id}`, {
+              method: "DELETE",
+              body: JSON.stringify(donation),
+              headers: {
+                  'Content-Type': 'application/json',
+              }
+          })
+      }
+  }
+
+  const abortInProgresses = async (donationsToRemove: Donation[]) => {
+      setInProgressDonations(inProgressDonations.filter(inProgressDonation => !donationsToRemove.includes(inProgressDonation)));
+      setAbortDonations(abortDonations.concat(donationsToRemove));
+      for (const donation of donationsToRemove) {
+          await updateDonation(donation, "chicken");
+      }
+  }
+
+  const checkForExpiredTimer = async () => {
+      let abortOpenArray: Donation[] = [];
+      let abortInProgressArray: Donation[] = [];
+      for (const donation of openDonations) {
+          if (getRemainingTime(donation) <= 0) {
+              abortOpenArray = [...abortOpenArray, donation];
+          }
+      }
+      for (const donation of inProgressDonations) {
+          if (getRemainingTime(donation) <= 0) {
+              abortInProgressArray = [...abortInProgressArray, donation];
+          }
+      }
+
+      if (abortOpenArray.length > 0) {
+          await abortOpens(abortOpenArray);
+      }
+      if (abortInProgressArray.length > 0) {
+          await abortInProgresses(abortInProgressArray);
       }
   }
 
@@ -237,7 +277,7 @@ function App() {
                                                   </div>
                                                   <div className="flex justify-between items-center">
                                                       <div className="timer" data-updated-at={donation.updatedAt}>
-                                                          60'
+                                                          {(60 - getRemainingTime(donation)).toFixed(0)}'
                                                       </div>
                                                       <FontAwesomeIcon icon={faDumbbell}
                                                                        color={getColor(donation)}
@@ -295,10 +335,10 @@ function App() {
                                               <div className="text-xl my-4">
                                                   {donation.task}
                                               </div>
-                                              <div className="timer" data-updated-at={donation.updatedAt}>
-                                                  60'
-                                              </div>
                                               <div className="flex justify-between items-center">
+                                                  <div className="timer" data-updated-at={donation.updatedAt}>
+                                                      {(60 - getRemainingTime(donation)).toFixed(0)}'
+                                                  </div>
                                                   <FontAwesomeIcon icon={faDumbbell}
                                                                    color={getColor(donation)}
                                                                    className="min-width" size={getSize(donation)}/>
