@@ -18,10 +18,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { QueryFunction, useMutation, useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import {config} from "@/Constants.js.ts";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
+const URL: string = config.url;
 export const Route = createLazyFileRoute("/challenge")({
   component: ChallengeRoute,
 });
@@ -41,7 +43,7 @@ const ChallengeRequestBodySchema = z.object({
 
 const fetchChallenges: QueryFunction<Challenge[], string[], never> = () =>
   axios
-    .get(`http://localhost:4000/api/challenges/`)
+    .get(`${URL}/api/challenges/`)
     // add a delay to simulate network latency
     .then(
       (response) =>
