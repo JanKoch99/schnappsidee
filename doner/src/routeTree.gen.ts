@@ -18,6 +18,7 @@ import { Route as rootRoute } from './routes/__root'
 
 const PerpetratorLazyImport = createFileRoute('/perpetrator')()
 const PaymentLazyImport = createFileRoute('/payment')()
+const FeedLazyImport = createFileRoute('/feed')()
 const DrinkLazyImport = createFileRoute('/drink')()
 const ChallengeLazyImport = createFileRoute('/challenge')()
 const IndexLazyImport = createFileRoute('/')()
@@ -33,6 +34,11 @@ const PaymentLazyRoute = PaymentLazyImport.update({
   path: '/payment',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/payment.lazy').then((d) => d.Route))
+
+const FeedLazyRoute = FeedLazyImport.update({
+  path: '/feed',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/feed.lazy').then((d) => d.Route))
 
 const DrinkLazyRoute = DrinkLazyImport.update({
   path: '/drink',
@@ -74,6 +80,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DrinkLazyImport
       parentRoute: typeof rootRoute
     }
+    '/feed': {
+      id: '/feed'
+      path: '/feed'
+      fullPath: '/feed'
+      preLoaderRoute: typeof FeedLazyImport
+      parentRoute: typeof rootRoute
+    }
     '/payment': {
       id: '/payment'
       path: '/payment'
@@ -97,6 +110,7 @@ export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   ChallengeLazyRoute,
   DrinkLazyRoute,
+  FeedLazyRoute,
   PaymentLazyRoute,
   PerpetratorLazyRoute,
 })
@@ -112,6 +126,7 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/challenge",
         "/drink",
+        "/feed",
         "/payment",
         "/perpetrator"
       ]
@@ -124,6 +139,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/drink": {
       "filePath": "drink.lazy.tsx"
+    },
+    "/feed": {
+      "filePath": "feed.lazy.tsx"
     },
     "/payment": {
       "filePath": "payment.lazy.tsx"
