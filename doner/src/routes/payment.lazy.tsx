@@ -1,23 +1,22 @@
+import twint from "@/assets/logo-twint.png";
+import Spinner from "@/components/spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import twint from "@/assets/logo-twint.png";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
-import Spinner from "@/components/spinner";
 
 export const Route = createLazyFileRoute("/payment")({
   component: PaymentRoute,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 export const CreateDonationRequestBodySchema = z.object({
   victim: z.string().email(),
   challengeID: z.string().length(24),
