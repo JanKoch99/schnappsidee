@@ -4,6 +4,7 @@ const Schema = mongoose.Schema
 
 const donationSchema = new Schema({
 
+
     victim: {
         type: String,
         required: true
@@ -32,6 +33,10 @@ const donationSchema = new Schema({
     victimName: {
         type: String,
         required: false
+    },
+    price: {
+        type: Number,
+        required: true
     },
 }, { timestamps: true })
 

@@ -16,7 +16,8 @@ const getDonations = async (req,res) => {
             victimName: donation.victimName,
             difficulty: donation.challengeID.difficulty,
             createdAt: donation.createdAt,
-            updatedAt: donation.updatedAt
+            updatedAt: donation.updatedAt,
+            price: donation.price
         }))
     res.status(200).json(formattedDonations)
 }
@@ -43,13 +44,15 @@ const getDonation = async (req,res) => {
             taskState: donation.taskState,
             victimName: donation.victimName,
             difficulty: donation.challengeID.difficulty,
+            price: donation.price
+
         }
 
     res.status(200).json(formattedDonation)
 }
 // create new donation
 const createDonation = async (req, res) => {
-    let {victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName} = req.body
+    let {victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName, price} = req.body
 
     let emptyFields = []
 
@@ -74,6 +77,9 @@ const createDonation = async (req, res) => {
     if(!victimName) {
         emptyFields.push('victimName')
     }
+    if(!price) {
+        emptyFields.push('price')
+    }
     if(emptyFields.length > 0){
         return res.status(400).json({ error: "Please fill in all the fields", emptyFields })
     }
@@ -91,6 +97,7 @@ const createDonation = async (req, res) => {
             taskState: populatedDonation.taskState,
             victimName: populatedDonation.victimName,
             difficulty: populatedDonation.challengeID.difficulty,
+            price: populatedDonation.price
         }
         req.broadcastEvent(formattedDonation)
         res.status(200).json(formattedDonation)
@@ -116,7 +123,7 @@ const deleteDonation = async (req,res) => {
 // update a donation
 const updateDonation = async (req,res) =>{
     const id = req.params.id
-    let {victim, challengeID, drink,perpetrator, contactInfo, taskState, victimName} = req.body
+    let {victim, challengeID, drink,perpetrator, contactInfo, taskState, victimName, price} = req.body
 
 
     if (!mongoose.Types.ObjectId.isValid(id)){
@@ -128,7 +135,7 @@ const updateDonation = async (req,res) =>{
     }
 
     const donation = await Donation.findOneAndUpdate({_id: id}, {
-        victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName
+        victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName, price
     }).populate("challengeID")
     console.log(perpetrator)
     if (!donation) {
@@ -145,6 +152,7 @@ const updateDonation = async (req,res) =>{
         taskState: donation.taskState,
         victimName: donation.victimName,
         difficulty: donation.challengeID.difficulty,
+        price: donation.price
     }
     if(taskState === 'inProgress'){
 
