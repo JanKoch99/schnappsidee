@@ -1,7 +1,7 @@
 import ChallengeCard from "@/components/challenge-card";
 import { useDonationStore } from "@/stores/donation";
 import { QueryFunction, useQuery } from "@tanstack/react-query";
-import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { createLazyFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 
 export const Route = createLazyFileRoute("/challenge")({
@@ -19,7 +19,11 @@ export type Challenge = {
 const fetchChallenges: QueryFunction<Challenge[], string[], never> = () =>
   axios
     .get(`http://localhost:4000/api/challenges/`)
-    .then((response) => response.data);
+    // add a delay to simulate network latency
+    .then(
+      (response) =>
+        new Promise((resolve) => setTimeout(() => resolve(response.data), 5000))
+    );
 
 function ChallengeRoute() {
   const navigate = useNavigate();
@@ -34,7 +38,14 @@ function ChallengeRoute() {
   });
 
   if (isPending) {
-    return <span>Loading...</span>;
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <img
+          src="https://cliply.co/wp-content/uploads/2019/07/371907850_BEER_TOAST_400x400.gif"
+          alt=""
+        />
+      </div>
+    );
   }
 
   if (isError) {
@@ -48,6 +59,10 @@ function ChallengeRoute() {
           <ChallengeCard key={index} {...challenge} />
         ))}
       </div>
+
+      <Link to="/perpetrator" className="text-center">
+        Next
+      </Link>
     </div>
   );
 }

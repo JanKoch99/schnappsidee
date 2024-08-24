@@ -16,11 +16,17 @@ import { Route as rootRoute } from './routes/__root'
 
 // Create Virtual Routes
 
+const PerpetratorLazyImport = createFileRoute('/perpetrator')()
 const DrinkLazyImport = createFileRoute('/drink')()
 const ChallengeLazyImport = createFileRoute('/challenge')()
 const IndexLazyImport = createFileRoute('/')()
 
 // Create/Update Routes
+
+const PerpetratorLazyRoute = PerpetratorLazyImport.update({
+  path: '/perpetrator',
+  getParentRoute: () => rootRoute,
+} as any).lazy(() => import('./routes/perpetrator.lazy').then((d) => d.Route))
 
 const DrinkLazyRoute = DrinkLazyImport.update({
   path: '/drink',
@@ -62,6 +68,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DrinkLazyImport
       parentRoute: typeof rootRoute
     }
+    '/perpetrator': {
+      id: '/perpetrator'
+      path: '/perpetrator'
+      fullPath: '/perpetrator'
+      preLoaderRoute: typeof PerpetratorLazyImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -71,6 +84,7 @@ export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   ChallengeLazyRoute,
   DrinkLazyRoute,
+  PerpetratorLazyRoute,
 })
 
 /* prettier-ignore-end */
@@ -83,7 +97,8 @@ export const routeTree = rootRoute.addChildren({
       "children": [
         "/",
         "/challenge",
-        "/drink"
+        "/drink",
+        "/perpetrator"
       ]
     },
     "/": {
@@ -94,6 +109,9 @@ export const routeTree = rootRoute.addChildren({
     },
     "/drink": {
       "filePath": "drink.lazy.tsx"
+    },
+    "/perpetrator": {
+      "filePath": "perpetrator.lazy.tsx"
     }
   }
 }
