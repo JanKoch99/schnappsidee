@@ -24,7 +24,7 @@ const getDonation = async (req,res) => {
 }
 // create new donation
 const createDonation = async (req, res) => {
-    const {victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
+    let {victim, task, drink, perpetrator, contactInfo, taskState, victimName, difficulty} = req.body
     let emptyFields = []
 
     if(!victim) {
@@ -37,7 +37,7 @@ const createDonation = async (req, res) => {
         emptyFields.push('drink')
     }
     if(!perpetrator) {
-        emptyFields.push('perpetrator')
+        perpetrator = "Anonymous"
     }
     if(!contactInfo) {
         emptyFields.push('contactInfo')
@@ -110,9 +110,6 @@ const updateDonation = async (req,res) =>{
 
             if (!response.data.ok) {
                 return res.status(400).send(response.data)
-            }
-            if (!perpetrator){
-                perpetrator= 'Anonymus'
             }
             const userID = response.data.user.id
             await axios.post(process.env.WEBHOOK, {
