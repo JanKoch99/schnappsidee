@@ -1,29 +1,32 @@
-import { create } from "zustand";
 import { z } from "zod";
-import { persist, createJSONStorage } from "zustand/middleware";
+import { create } from "zustand";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 export const VictimSchema = z.object({
   email: z.string().email(),
   name: z.string().regex(/^[a-zA-Z\s.]{3,}$/, {
-    message: "Are you kidding me? That's the name?",
+    message: "Are you kidding me? That's the name of your victim?",
   }),
 });
 
 export const DonationSchema = z.object({
   victim: VictimSchema,
   drink: z.string().min(3),
+  challenge: z.string().min(3),
 });
 
 export const useDonationStore = create<
   z.infer<typeof DonationSchema> & {
     setVictim: (victim: z.infer<typeof VictimSchema>) => void;
     setDrink: (drink: string) => void;
+    setChallenge: (challenge: string) => void;
   }
 >()(
   persist<
     z.infer<typeof DonationSchema> & {
       setVictim: (victim: z.infer<typeof VictimSchema>) => void;
       setDrink: (drink: string) => void;
+      setChallenge: (challenge: string) => void;
     }
   >(
     (set) => ({
@@ -32,14 +35,16 @@ export const useDonationStore = create<
         name: "",
       },
       drink: "",
+      challenge: "",
       setVictim: (victim: z.infer<typeof VictimSchema>) =>
         set(() => ({
           victim,
         })),
       setDrink: (drink: string) => set({ drink }),
+      setChallenge: (challenge: string) => set({ challenge }),
     }),
     {
-      name: "victim-storage",
+      name: "donation-storage",
       storage: createJSONStorage(() => sessionStorage),
     }
   )

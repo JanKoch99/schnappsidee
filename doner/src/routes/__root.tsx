@@ -25,7 +25,7 @@ export default function Root() {
         </div>
       </div>
 
-      <div className="px-5 mt-24">
+      <div className="px-5">
         <Outlet />
       </div>
 

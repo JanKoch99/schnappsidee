@@ -9,15 +9,13 @@ export const Route = createLazyFileRoute("/challenge")({
 
 function ChallengeRoute() {
   const navigate = useNavigate();
-  const { name, phone } = useDonationStore();
-  if (!name || !phone) {
+  const { victim } = useDonationStore();
+  if (!victim.name || !victim.email) {
     navigate({ to: "/" });
   }
 
   return (
     <div className="flex flex-col gap-6">
-      Your victim is {name} and their phone number is {phone}. You selected the
-      following drink for them:
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         {challenges
           .sort((a, b) => a.difficulty - b.difficulty)
