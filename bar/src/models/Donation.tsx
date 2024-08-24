@@ -10,5 +10,4 @@ export interface Donation {
     difficulty: number;
     createdAt: Date;
     updatedAt: Date;
-    __v: number;
 }

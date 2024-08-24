@@ -15,6 +15,8 @@ const getDonations = async (req,res) => {
             taskState: donation.taskState,
             victimName: donation.victimName,
             difficulty: donation.challengeID.difficulty,
+            createdAt: donation.createdAt,
+            updatedAt: donation.updatedAt
         }))
     res.status(200).json(formattedDonations)
 }
