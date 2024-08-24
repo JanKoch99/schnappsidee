@@ -1,11 +1,13 @@
 require('dotenv').config()
 
 const express = require('express')
-const axios = require('axios')
+const cors = require('cors');
 const {mongoose} = require("mongoose");
 const donationRoutes = require('./routes/donations')
 // express app
 const app = express()
+
+app.use(cors());
 
 //middleware
 app.use(express.json())

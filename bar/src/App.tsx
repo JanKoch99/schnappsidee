@@ -1,6 +1,6 @@
 import './App.css'
 import {Table, TableBody, TableHeader, TableRow} from "@/components/ui/table.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faCircleCheck, faCircleXmark, faCircleArrowRight, faDumbbell} from "@fortawesome/free-solid-svg-icons";
 import {
@@ -13,68 +13,101 @@ import {
 } from "@/components/ui/dialog"
 import {Card} from "@/components/ui/card.tsx";
 import {Donation} from "@/models/Donation.tsx";
+import {config} from "@/Constants.js.ts";
 
 function App() {
-  const [openDonations, setOpenDonations] = useState<Donation[]>([
-      {
-          id: '1',
-          victim: 'alessio',
-          task: 'breakdance',
-          drink: 'sirup',
-          perpetrator: 'chasperli',
-          contactInfo: 'chasperli@email.com',
-          taskState: 'open',
-          victimName: 'Alessio',
-          createdAt: new Date('2024-08-23T12:00:00Z'),
-          difficulty: 3
-      },
-      {
-          id: '2',
-          victim: 'mario',
-          task: 'juggle',
-          drink: 'water',
-          perpetrator: 'frankie',
-          contactInfo: 'frankie@email.com',
-          taskState: 'inProgress',
-          victimName: 'Mario',
-          createdAt: new Date('2024-08-22T09:30:00Z'),
-          difficulty: 4
-      },
-      {
-          id: '3',
-          victim: 'luigi',
-          task: 'sing',
-          drink: 'juice',
-          perpetrator: 'luisa',
-          contactInfo: 'luisa@email.com',
-          taskState: 'done',
-          victimName: 'Luigi',
-          createdAt: new Date('2024-08-21T15:45:00Z'),
-          difficulty: 2
-      }
-  ]);
+  const [donations, setDonations] = useState<Donation[]>([])
+  const [openDonations, setOpenDonations] = useState<Donation[]>([]);
   const [inProgressDonations, setInProgressDonations] = useState<Donation[]>([]);
   const [doneDonations, setDoneDonations] = useState<Donation[]>([]);
   const [abortDonations, setAbortDonations] = useState<Donation[]>([]);
+  const URL: string =config.url;
 
-  const setToProgress = (donation: Donation) => {
+  useEffect(() => {
+      const fetchDonations = async () => {
+          const response = await fetch(`${URL}/api/donations`);
+          const json = await response.json();
+          if (response.ok) {
+              setDonations(json as Donation[]);
+          }
+      }
+
+      fetchDonations();
+  }, [URL]);
+
+  useEffect(() => {
+      if (donations.length > 0) {
+          const newOpenDonations: Donation[] = [];
+          const newInProgressDonations: Donation[] = [];
+          const newDoneDonations: Donation[] = [];
+          const newAbortDonations: Donation[] = [];
+          const remainingDonations: Donation[] = [];
+
+          donations.forEach((donation: Donation) => {
+              if (donation.taskState === "open") {
+                  newOpenDonations.push(donation);
+              } else if (donation.taskState === "inProgress") {
+                  newInProgressDonations.push(donation);
+              } else if (donation.taskState === "done") {
+                  newDoneDonations.push(donation);
+              } else if (donation.taskState === "chicken") {
+                  newAbortDonations.push(donation);
+              } else {
+                  remainingDonations.push(donation);
+              }
+          });
+
+          setOpenDonations(newOpenDonations);
+          setInProgressDonations(newInProgressDonations);
+          setDoneDonations(newDoneDonations);
+          setAbortDonations(newAbortDonations);
+          setDonations(remainingDonations);
+      }
+
+  }, [donations])
+
+
+
+  const updateDonation = async (donation: Donation, taskState: string) => {
+      donation.taskState = taskState;
+      const response = await fetch(`${URL}/api/donations/${donation._id}`, {
+          method: "PATCH",
+          body: JSON.stringify(donation),
+          headers: {
+              'Content-Type': 'application/json',
+          }
+      });
+      await response.json();
+    }
+
+  const setToProgress = async (donation: Donation) => {
       setOpenDonations(openDonations.filter(openDonation => openDonation != donation));
       setInProgressDonations(inProgressDonations.concat(donation));
+      await updateDonation(donation, "inProgress");
   }
 
-  const abortOpen = (donation: Donation) => {
+  const abortOpen = async (donation: Donation) => {
       setOpenDonations(openDonations.filter(openDonation => openDonation != donation));
+      await fetch(`${URL}/api/donations/${donation._id}`, {
+          method: "DELETE",
+          body: JSON.stringify(donation),
+          headers: {
+              'Content-Type': 'application/json',
+          }
+      })
 
   }
 
-  const abortInProgress = (donation: Donation) => {
+  const abortInProgress = async (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setAbortDonations(abortDonations.concat(donation));
+      await updateDonation(donation, "chicken");
   }
 
-  const setToDone = (donation: Donation) => {
+  const setToDone = async (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setDoneDonations(doneDonations.concat(donation));
+      await updateDonation(donation, "done");
   }
 
   const getSize = (donation: Donation) => {
@@ -100,6 +133,7 @@ function App() {
   return (
     <div className="p-10 flex">
           <div className="flex w-full justify-center flex-col">
+              {/*TODO: Add bar name*/}
               <h1 className="text-4xl font-bold">Challenges</h1>
               {/*All open donations*/}
               <Table className="mt-5">

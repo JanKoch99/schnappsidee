@@ -1,5 +1,5 @@
 export interface Donation {
-    id: string
+    _id: string;
     victim: string;
     task: string;
     drink: string;
@@ -7,6 +7,8 @@ export interface Donation {
     contactInfo: string;
     taskState: string;
     victimName: string;
-    createdAt: Date;
     difficulty: number;
+    createdAt: Date;
+    updatedAt: Date;
+    __v: number;
 }

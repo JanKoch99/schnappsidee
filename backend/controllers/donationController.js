@@ -4,7 +4,6 @@ const axios = require("axios");
 // get all workouts
 const getDonations = async (req,res) => {
     const donations = await Donation.find().sort({createdAt: -1})
-
     res.status(200).json(donations)
 }
 // get a single donation
