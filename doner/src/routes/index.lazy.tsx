@@ -2,14 +2,13 @@ import { Button } from "@/components/ui/button";
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useDonationStore, PersonSchema } from "@/stores/donation";
+import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -82,7 +81,7 @@ function VictimForm() {
                   )}
                 />
 
-                <Button type="submit">Submit</Button>
+                <Button type="submit">Hold my 🍺</Button>
               </form>
             </Form>
           </div>
