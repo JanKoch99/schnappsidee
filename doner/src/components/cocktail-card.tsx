@@ -1,33 +1,34 @@
 import { Drink } from "@/assets/drinks";
-import { Card } from "@/components/ui/card";
-import { useDonationStore } from "@/stores/donation";
 import React from "react";
 
 const CocktailCard: React.FC<Drink & { active?: boolean }> = ({
   image,
   name,
-  description,
+  category,
   price,
-  active,
 }) => {
-  const { setDrink, drink } = useDonationStore();
   return (
-    <Card className={!active && drink ? "opacity-25" : ""}>
-      <div className="flex cursor-pointer" onClick={() => setDrink(name)}>
+    <>
+      <div className="aspect-h-1 aspect-w-1 w-full overflow-hidden rounded-md bg-gray-200 lg:aspect-none group-hover:opacity-75 lg:h-80">
         <img
-          draggable={false}
+          alt={name}
           src={image}
-          className={
-            "h-24 w-auto object-cover transition-all hover:scale-105 aspect-square rounded-l-xl"
-          }
+          className="h-full w-full object-cover object-center lg:h-full lg:w-full"
         />
-        <div className="flex flex-col px-2 py-3 overflow-hidden">
-          <h2 className="font-bold truncate">{name}</h2>
-          <p className="truncate">{description}</p>
-          CHF {price.toFixed(2)}
-        </div>
       </div>
-    </Card>
+      <div className="mt-4 flex justify-between">
+        <div>
+          <h3 className="text-sm text-gray-700">
+            <span>
+              <span aria-hidden="true" className="absolute inset-0" />
+              {name}
+            </span>
+          </h3>
+          <p className="mt-1 text-sm text-gray-500">{category}</p>
+        </div>
+        <p className="text-sm font-medium text-gray-900">{price.toFixed(2)}</p>
+      </div>
+    </>
   );
 };
 
