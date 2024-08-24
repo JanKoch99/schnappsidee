@@ -9,10 +9,15 @@ export const PersonSchema = z.object({
   }),
 });
 
+export const DrinkSchema = z.object({
+  name: z.string().min(3),
+  price: z.number().positive(),
+});
+
 export const DonationSchema = z.object({
   victim: PersonSchema,
   perpetrator: PersonSchema,
-  drink: z.string().min(3),
+  drink: DrinkSchema,
   challenge: z.string().min(3),
 });
 
@@ -20,7 +25,7 @@ export const useDonationStore = create<
   z.infer<typeof DonationSchema> & {
     setVictim: (victim: z.infer<typeof PersonSchema>) => void;
     setPerpetrator: (perpetrator: z.infer<typeof PersonSchema>) => void;
-    setDrink: (drink: string) => void;
+    setDrink: (drink: z.infer<typeof DrinkSchema>) => void;
     setChallenge: (challenge: string) => void;
   }
 >()(
@@ -28,7 +33,7 @@ export const useDonationStore = create<
     z.infer<typeof DonationSchema> & {
       setVictim: (victim: z.infer<typeof PersonSchema>) => void;
       setPerpetrator: (perpetrator: z.infer<typeof PersonSchema>) => void;
-      setDrink: (drink: string) => void;
+      setDrink: (drink: z.infer<typeof DrinkSchema>) => void;
       setChallenge: (challenge: string) => void;
     }
   >(
@@ -41,7 +46,10 @@ export const useDonationStore = create<
         email: "",
         name: "",
       },
-      drink: "",
+      drink: {
+        name: "",
+        price: 0,
+      },
       challenge: "",
       setVictim: (victim: z.infer<typeof PersonSchema>) =>
         set(() => ({
@@ -51,7 +59,7 @@ export const useDonationStore = create<
         set(() => ({
           perpetrator,
         })),
-      setDrink: (drink: string) => set({ drink }),
+      setDrink: (drink: z.infer<typeof DrinkSchema>) => set({ drink }),
       setChallenge: (challenge: string) => set({ challenge }),
     }),
     {

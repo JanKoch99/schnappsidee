@@ -59,7 +59,7 @@ function ChallengeRoute() {
           Choose the challenge!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          If <span className="textgray-600">{victim.name}</span> completes the challenge, you will donate a {drink}.
+          If <span className="textgray-600">{victim.name}</span> completes the challenge, you will donate a {drink.name}.
         </p>
       </div>
       <div className="m-12 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 xl:gap-x-8">
