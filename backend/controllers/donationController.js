@@ -66,7 +66,6 @@ const createDonation = async (req, res) => {
 // delete a donation
 const deleteDonation = async (req,res) => {
     const id = req.params.id
-    const {victim, task, drink,perpetrator, contactInfo, taskState} = req.body
     if (!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: ' No such donation'})
     }
