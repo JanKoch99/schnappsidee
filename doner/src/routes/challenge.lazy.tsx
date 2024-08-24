@@ -67,7 +67,7 @@ function ChallengeRoute() {
 
   const mutation = useMutation({
     mutationFn: (challenge: z.infer<typeof ChallengeRequestBodySchema>) => {
-      return axios.post("/challenges", challenge);
+      return axios.post(`${URL}/api/challenges/`, challenge);
     },
   });
 

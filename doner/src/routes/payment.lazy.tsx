@@ -9,6 +9,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
+import { config } from "@/Constants.js.ts";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -28,6 +29,7 @@ export const CreateDonationRequestBodySchema = z.object({
   price: z.number().positive(),
 });
 
+const URL: string = config.url;
 function PaymentRoute() {
   const navigate = useNavigate();
   const { perpetrator, victim, drink, challenge } = useDonationStore();
@@ -41,7 +43,7 @@ function PaymentRoute() {
 
   const mutation = useMutation({
     mutationFn: (donation: z.infer<typeof CreateDonationRequestBodySchema>) => {
-      return axios.post("/donations", donation);
+      return axios.post(`${URL}/api/donations`, donation);
     },
   });
 
