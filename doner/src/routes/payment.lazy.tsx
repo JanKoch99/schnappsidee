@@ -1,21 +1,23 @@
+import twint from "@/assets/logo-twint.png";
+import Spinner from "@/components/spinner";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
 import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import twint from "@/assets/logo-twint.png";
 
 export const Route = createLazyFileRoute("/payment")({
   component: PaymentRoute,
 });
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const CreateDonationRequestBodySchema = z.object({
+export const CreateDonationRequestBodySchema = z.object({
   victim: z.string().email(),
   challengeID: z.string().length(24),
   drink: z.string().min(3),
@@ -27,6 +29,7 @@ const CreateDonationRequestBodySchema = z.object({
 });
 
 function PaymentRoute() {
+  const navigate = useNavigate();
   const { perpetrator, victim, drink, challenge } = useDonationStore();
   const form = useForm<z.infer<typeof PersonSchema>>({
     resolver: zodResolver(PersonSchema),
@@ -43,15 +46,27 @@ function PaymentRoute() {
   });
 
   if (mutation.isPending) {
-    return <span>Submitting...</span>;
+    return (
+      <div className="h-full w-full flex justify-center items-center">
+        <Spinner />
+      </div>
+    );
   }
 
   if (mutation.isSuccess) {
-    return <span>Submitted!</span>;
+    navigate({ to: "/feed" });
   }
 
   if (mutation.isError) {
-    return <span>Error: {mutation.error.message}</span>;
+    return (
+      <div className="mx-auto max-w-2xl text-center mt-24">
+        <Alert variant="destructive">
+          <ExclamationTriangleIcon className="h-4 w-4" />
+          <AlertTitle>Error</AlertTitle>
+          <AlertDescription>{mutation.error.message}</AlertDescription>
+        </Alert>
+      </div>
+    );
   }
 
   return (

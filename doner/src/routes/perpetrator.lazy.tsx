@@ -38,7 +38,7 @@ function PerpetratorRoute() {
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
           We need some information about you to send the challenge to{" "}
-          {victim.name}.
+          <span className="font-bold">{victim.name}</span>.
         </p>
       </div>
 

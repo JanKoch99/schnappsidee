@@ -21,10 +21,10 @@ function Drink() {
           Choose the poison!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          Select a drink to send to {victim.name}.
+          Select a drink to send to <span className="font-bold">{victim.name}</span>.
         </p>
       </div>
-      <div className="m-12 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 xl:grid-cols-5 xl:gap-x-8">
+      <div className="m-12 grid grid-cols-1 gap-x-6 gap-y-10 xl:grid-cols-2 xl:gap-x-8">
         {drinks.map((d: Drink, index) => (
           <div
             key={index}

@@ -56,9 +56,6 @@ const createDonation = async (req, res) => {
 
     let emptyFields = []
 
-    if(!victim) {
-        emptyFields.push('victim')
-    }
     if(!challengeID) {
         emptyFields.push('challengeID')
     }
@@ -154,6 +151,8 @@ const updateDonation = async (req,res) =>{
         difficulty: donation.challengeID.difficulty,
         price: donation.price
     }
+
+
     if(taskState === 'inProgress'){
 
         try {

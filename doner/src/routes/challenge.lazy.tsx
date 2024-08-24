@@ -1,4 +1,5 @@
 import ChallengeCard from "@/components/challenge-card";
+import Spinner from "@/components/spinner";
 import { useDonationStore } from "@/stores/donation";
 import { QueryFunction, useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
@@ -40,10 +41,7 @@ function ChallengeRoute() {
   if (isPending) {
     return (
       <div className="h-full w-full flex justify-center items-center">
-        <img
-          src="https://cliply.co/wp-content/uploads/2019/07/371907850_BEER_TOAST_400x400.gif"
-          alt=""
-        />
+        <Spinner />
       </div>
     );
   }
@@ -59,11 +57,12 @@ function ChallengeRoute() {
           Choose the challenge!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          If <span className="textgray-600">{victim.name}</span> completes the
-          challenge, you will donate a {drink.name}.
+          If <span className="font-bold">{victim.name}</span> completes the
+          challenge, you will donate a{" "}
+          <span className="font-bold">{drink.name}</span>.
         </p>
       </div>
-      <div className="mx-12 grid grid-cols-1 gap-x-6 gap-y-5 sm:grid-cols-2 xl:grid-cols-5 xl:gap-x-8">
+      <div className="mx-12 grid grid-cols-1 gap-x-6 gap-y-5 xl:grid-cols-2 xl:gap-x-8">
         {data
           .sort((a, b) => a.difficulty - b.difficulty)
           .map((challenge: Challenge, index: number) => (

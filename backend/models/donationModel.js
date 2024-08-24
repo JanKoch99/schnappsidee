@@ -7,7 +7,7 @@ const donationSchema = new Schema({
 
     victim: {
         type: String,
-        required: true
+        required: false
     },
     challengeID: {
         type: Schema.Types.ObjectId,
