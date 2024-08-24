@@ -3,10 +3,12 @@ require('dotenv').config()
 const express = require('express')
 const cors = require('cors');
 const {mongoose} = require("mongoose");
+const eventRoutes = require('./routes/events')
 const donationRoutes = require('./routes/donations')
 const challengeRoutes = require('./routes/challenges')
 // express app
 const app = express()
+const clientsById = require('./middleware/clients');
 
 app.use(cors());
 
@@ -19,48 +21,33 @@ app.use((req,res,next) =>  {
 })
 
 
-// Array zum Speichern der verbundenen Clients
-let clients = [];
-
-const broadcastEvent = (event) => {
-    clients.forEach(client => {
-        client.write(`data: ${JSON.stringify(event)}\n\n`);
-    });
+// Broadcast function
+const broadcastEventById = (id, event) => {
+    if (clientsById[id]) {
+        clientsById[id].forEach(client => {
+            client.write(`data: ${JSON.stringify(event)}\n\n`);
+        });
+    }
 };
 app.use((req, res, next) => {
-    req.broadcastEvent = broadcastEvent;
+    req.broadcastEventById = broadcastEventById;
     next();
 });
-// SSE-Route
-app.get('/events', (req, res) => {
-    res.setHeader('Content-Type', 'text/event-stream');
-    res.setHeader('Cache-Control', 'no-cache');
-    res.setHeader('Connection', 'keep-alive');
-
-    // Einen neuen Client hinzufügen
-    clients.push(res);
-
-    // Verbindung wird geschlossen, wenn der Client abbricht
-    req.on('close', () => {
-        clients = clients.filter(client => client !== res);
-    });
-});
-
-
+app.use('/events', eventRoutes)
 // routes
 app.use('/api/donations', donationRoutes)
 app.use('/api/challenges', challengeRoutes)
 
 // connect to db
-    mongoose.connect(process.env.MONGO_URI)
-        .then(() => {
-            // listen for requests
-            app.listen(process.env.PORT, () => {
-                console.log('connected to db & listening on port ', process.env.PORT)
-            })
+mongoose.connect(process.env.MONGO_URI)
+    .then(() => {
+        // listen for requests
+        app.listen(process.env.PORT, () => {
+            console.log('connected to db & listening on port ', process.env.PORT)
+        })
 
 
-        })
-        .catch((error) => {
-            console.log(error)
-        })
+    })
+    .catch((error) => {
+        console.log(error)
+    })

@@ -5,6 +5,8 @@ import { useState } from "react";
 import { z } from "zod";
 import { CreateDonationRequestBodySchema } from "./payment.lazy";
 import { type Moment } from "moment";
+import {config} from "@/Constants.js.ts";
+const URL: string =config.url;
 
 export const Route = createLazyFileRoute("/feed")({
   component: FeedRoute,
@@ -20,7 +22,8 @@ type TimelineEvent = {
 
 function FeedRoute() {
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
-  const eventSource = new EventSource(`${URL}/events`);
+  //TODO: Michael please help ! ! ! or else . . .
+  const eventSource = new EventSource(`${URL}/events/${SOMETHINGSOMETHING._id}`);
   eventSource.onmessage = function (event) {
     const newDonation = JSON.parse(event.data);
     console.log(newDonation);

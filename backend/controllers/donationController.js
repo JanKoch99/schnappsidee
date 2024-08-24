@@ -84,6 +84,7 @@ const createDonation = async (req, res) => {
     try {
         const donation = await Donation.create({victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName, price});
         const populatedDonation = await Donation.findById(donation._id).populate("challengeID")
+
         const formattedDonation = {
             _id: populatedDonation._id,
             victim: populatedDonation.victim,
@@ -96,7 +97,7 @@ const createDonation = async (req, res) => {
             difficulty: populatedDonation.challengeID.difficulty,
             price: populatedDonation.price
         }
-        req.broadcastEvent(formattedDonation)
+        req.broadcastEventById(formattedDonation)
         res.status(200).json(formattedDonation)
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -134,7 +135,6 @@ const updateDonation = async (req,res) =>{
     const donation = await Donation.findOneAndUpdate({_id: id}, {
         victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName, price
     }).populate("challengeID")
-    console.log(perpetrator)
     if (!donation) {
         return res.status(404).json({error: 'No such donation'})
     }
@@ -253,7 +253,7 @@ const updateDonation = async (req,res) =>{
         }
     }
 
-
+    req.broadcastEventById(formattedDonation)
     res.status(200).json(formattedDonation)
 }
 
