@@ -67,3 +67,145 @@
     @apply bg-background text-foreground;
   }
 }
+
+.wave {
+  animation-duration: 2s;
+  animation-fill-mode: forwards;
+  animation-iteration-count: infinite;
+  animation-timing-function: linear;
+  fill: #f1c40f;
+}
+
+.bubbles {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(
+          circle at 10% 20%,
+          rgba(255, 255, 255, 0.5) 4%,
+          transparent 4%
+  ),
+  radial-gradient(
+          circle at 40% 80%,
+          rgba(255, 255, 255, 0.5) 3%,
+          transparent 3%
+  ),
+  radial-gradient(
+          circle at 60% 30%,
+          rgba(255, 255, 255, 0.5) 3%,
+          transparent 3%
+  ),
+  radial-gradient(
+          circle at 80% 50%,
+          rgba(255, 255, 255, 0.5) 5%,
+          transparent 5%
+  ),
+  radial-gradient(
+          circle at 50% 50%,
+          rgba(255, 255, 255, 0.5) 4%,
+          transparent 4%
+  ),
+  radial-gradient(
+          circle at 90% 10%,
+          rgba(255, 255, 255, 0.5) 3%,
+          transparent 3%
+  );
+  background-size: 10% 10%;
+  animation: bubbleAnimation 15s infinite;
+  opacity: 0.6;
+  z-index: 1;
+}
+
+.beer {
+  top: calc(15%);
+  bottom: 0;
+}
+
+
+.bubble {
+  position: absolute;
+  bottom: 0;
+  width: 20px;
+  height: 20px;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+  animation: bubbleFloat 5s infinite;
+  z-index: 3;
+  opacity: 0.7;
+}
+
+.bubble:nth-child(1) {
+  left: 10%;
+  animation-duration: 6s;
+  animation-delay: 1s;
+}
+
+.bubble:nth-child(2) {
+  left: 25%;
+  animation-duration: 8s;
+  animation-delay: 2s;
+}
+
+.bubble:nth-child(3) {
+  left: 40%;
+  animation-duration: 7s;
+  animation-delay: 3s;
+}
+
+.bubble:nth-child(4) {
+  left: 55%;
+  animation-duration: 9s;
+  animation-delay: 4s;
+}
+
+.bubble:nth-child(5) {
+  left: 70%;
+  animation-duration: 6.5s;
+  animation-delay: 2.5s;
+}
+
+.bubble:nth-child(6) {
+  left: 85%;
+  animation-duration: 7.5s;
+  animation-delay: 3.5s;
+}
+
+@keyframes bubbleAnimation {
+  0% {
+    background-position: 0% 100%;
+  }
+  50% {
+    background-position: 100% 0%;
+  }
+  100% {
+    background-position: 0% 100%;
+  }
+}
+
+@keyframes waveAnimation {
+  0% {
+    transform: scale(2) translateY(0);
+  }
+  50% {
+    transform: scale(2) translateY(10px);
+  }
+  100% {
+    transform: scale(2) translateY(0);
+  }
+}
+
+@keyframes bubbleFloat {
+  0% {
+    bottom: 0;
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-20px) scale(1.2);
+  }
+  100% {
+    bottom: 100%;
+    transform: translateY(-100px) scale(1);
+  }
+}

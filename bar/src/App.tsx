@@ -2,7 +2,7 @@ import './App.css'
 import {Table, TableBody, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {useEffect, useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleCheck, faCircleXmark, faCircleArrowRight, faDumbbell} from "@fortawesome/free-solid-svg-icons";
+import {faCircleCheck, faCircleXmark, faDumbbell} from "@fortawesome/free-solid-svg-icons";
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -40,30 +40,6 @@ function App() {
       fetchDonations();
 
   }, [URL]);
-    useEffect(() => {
-
-        const eventSource = new EventSource(`${URL}/events`);
-        eventSource.onmessage = function (event) {
-            const newDonation = JSON.parse(event.data);
-            console.log(newDonation)
-            setOpenDonations((prevOpenDonations) => {
-                if (!prevOpenDonations.some((donation) => donation._id === newDonation._id)) {
-                    return [...prevOpenDonations, newDonation];
-                }
-                return prevOpenDonations;
-            });
-
-            /*setDonations((prevDonations) => {
-                if (!prevDonations.some((donation) => donation._id === newDonation._id)) {
-                    return [...prevDonations, newDonation];
-                }
-                return prevDonations;
-            });*/
-        }
-        return () => {
-            eventSource.close()
-        }
-    }, []);
 
   useEffect(() => {
       if (donations.length > 0) {
@@ -97,11 +73,16 @@ function App() {
   }, [donations])
 
 
-    //TODO: If new donation is added call:       triggerConfetti();
+    const eventSource = new EventSource(`${URL}/events`);
+    eventSource.onmessage = function (event) {
+        const newDonation = JSON.parse(event.data);
+        const donationArray: Donation[] = [...openDonations, newDonation].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime())
+        setOpenDonations(donationArray);
+        triggerConfetti("");
+    }
 
   const updateDonation = async (donation: Donation, taskState: string) => {
       donation.taskState = taskState;
-
       const response = await fetch(`${URL}/api/donations/${donation._id}`, {
           method: "PATCH",
           body: JSON.stringify(donation),
@@ -236,13 +217,12 @@ function App() {
     return (
     <div className="p-10 flex">
           <div className="flex w-full justify-center flex-col">
-              {/*TODO: Add bar name*/}
-              <h1 className="text-4xl font-bold">Challenges</h1>
+              <h1 className="text-4xl font-bold">vera calma</h1>
               {/*All open donations*/}
               <Table className="mt-5">
                   <TableHeader>
                       <TableRow>
-                          <td className="text-2xl">Open 4 all</td>
+                          <td className="text-2xl font-bold">Open 4 all</td>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -255,14 +235,14 @@ function App() {
                                                   <div className="text-xl my-4">
                                                       {donation.task}
                                                   </div>
-                                                  <div className="timer" data-updated-at={donation.updatedAt}>
-                                                      60 min
-                                                  </div>
                                                   <div className="flex justify-between items-center">
+                                                      <div className="timer" data-updated-at={donation.updatedAt}>
+                                                          60'
+                                                      </div>
                                                       <FontAwesomeIcon icon={faDumbbell}
                                                                        color={getColor(donation)}
-                                                                       className="me-3 min-width" size={getSize(donation)}/>
-                                                      <FontAwesomeIcon icon={faCircleArrowRight} size="2x"/>
+                                                                       className="min-width ms-1"
+                                                                       size={getSize(donation)}/>
                                                   </div>
                                               </td>
                                           </TableRow>
@@ -272,12 +252,16 @@ function App() {
                                       <DialogHeader>
                                           <DialogTitle>Challenge for {donation.victimName} accepting?</DialogTitle>
                                       </DialogHeader>
-                                      <div className="flex gap-4 py-4 justify-center">
+                                      <div className="flex gap-4 pt-4 justify-center">
                                           Task: {donation.task}
                                       </div>
+                                      {donation.price &&
+                                          <div className="flex gap-4 pb-4 justify-center">
+                                              Price: CHF {donation.price.toFixed(2)}
+                                          </div>}
                                       <DialogFooter>
                                           <DialogClose asChild>
-                                              <div className="flex justify-around">
+                                          <div className="flex justify-around">
                                                   <FontAwesomeIcon onClick={() => {
                                                       setToProgress(donation)
                                                   }} className="me-3 text-green-500" icon={faCircleCheck}
@@ -298,7 +282,7 @@ function App() {
               <Table className="mt-5">
                   <TableHeader>
                       <TableRow>
-                          <td className="text-2xl">In progress</td>
+                          <td className="text-2xl font-bold">In progress</td>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -312,13 +296,12 @@ function App() {
                                                   {donation.task}
                                               </div>
                                               <div className="timer" data-updated-at={donation.updatedAt}>
-                                                  60 min
+                                                  60'
                                               </div>
                                               <div className="flex justify-between items-center">
                                                   <FontAwesomeIcon icon={faDumbbell}
                                                                    color={getColor(donation)}
-                                                                   className="me-3 min-width" size={getSize(donation)}/>
-                                                  <FontAwesomeIcon icon={faCircleArrowRight} size="2x"/>
+                                                                   className="min-width" size={getSize(donation)}/>
                                               </div>
                                           </td>
                                       </TableRow>
@@ -329,12 +312,17 @@ function App() {
                                       <DialogTitle>Did {donation.victimName} successfully finish the
                                           challenge?</DialogTitle>
                                   </DialogHeader>
-                                  <div className="flex gap-4 py-4 justify-center">
+                                  <div className="flex gap-4 pt-4 justify-center">
                                       Task: {donation.task}
                                   </div>
+                                  {donation.price &&
+                                      <div className="flex gap-4 pb-4 justify-center">
+                                          Price: CHF {donation.price.toFixed(2)}
+                                      </div>
+                                  }
                                   <DialogFooter>
                                       <DialogClose asChild>
-                                          <div className="flex justify-around">
+                                      <div className="flex justify-around">
                                               <FontAwesomeIcon onClick={() => {
                                                   setToDone(donation)
                                               }} className="me-3 text-green-500" icon={faCircleCheck} size="3x"/>
@@ -354,7 +342,7 @@ function App() {
               <Table className="mt-5">
                   <TableHeader>
                       <TableRow>
-                          <td className="text-2xl">Done</td>
+                          <td className="text-2xl font-bold">Done</td>
                       </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -376,7 +364,7 @@ function App() {
               <Table className="mt-5">
                   <TableHeader>
                       <TableRow>
-                          <td className="text-2xl">Chickened out</td>
+                          <td className="text-2xl font-bold">Chickened out</td>
                       </TableRow>
                   </TableHeader>
                   <TableBody>

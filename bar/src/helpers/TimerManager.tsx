@@ -23,9 +23,9 @@ class TimerManager {
                 const updatedAt = new Date(dataUpdatedAt);
                 const minutesLeft = this.calculateMinutesLeft(updatedAt);
                 if (minutesLeft <= 0) {
-                    element.textContent = '0 min';
+                    element.textContent = "0'";
                 } else {
-                    element.textContent = `${Math.floor(minutesLeft)} min`;
+                    element.textContent = `${Math.floor(minutesLeft)}'`;
                 }
             }
         });
