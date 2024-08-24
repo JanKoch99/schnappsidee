@@ -38,7 +38,7 @@ const createChallenge = async (req, res) => {
     }
     //add doc to db
     try {
-        const challenge = await  Donation.create({task, difficulty});
+        const challenge = await  Challenge.create({task, difficulty});
         res.status(200).json(challenge)
     } catch (error) {
         res.status(400).json({error: error.message})

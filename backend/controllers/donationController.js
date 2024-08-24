@@ -47,15 +47,15 @@ const getDonation = async (req,res) => {
 }
 // create new donation
 const createDonation = async (req, res) => {
-    let {victim, challengeId, drink, perpetrator, contactInfo, taskState, victimName} = req.body
+    let {victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName} = req.body
 
     let emptyFields = []
 
     if(!victim) {
         emptyFields.push('victim')
     }
-    if(!challengeId) {
-        emptyFields.push('challengeId')
+    if(!challengeID) {
+        emptyFields.push('challengeID')
     }
     if(!drink) {
         emptyFields.push('drink')
@@ -72,15 +72,12 @@ const createDonation = async (req, res) => {
     if(!victimName) {
         emptyFields.push('victimName')
     }
-    if(!difficulty) {
-        emptyFields.push('difficulty')
-    }
     if(emptyFields.length > 0){
         return res.status(400).json({ error: "Please fill in all the fields", emptyFields })
     }
     //add doc to db
     try {
-        const donation = await  Donation.create({victim, challengeId, drink, perpetrator, contactInfo, taskState, victimName});
+        const donation = await  Donation.create({victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName});
         res.status(200).json(donation)
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -104,18 +101,21 @@ const deleteDonation = async (req,res) => {
 // update a donation
 const updateDonation = async (req,res) =>{
     const id = req.params.id
-    let {victim, challengeId, drink,perpetrator, contactInfo, taskState, victimName} = req.body
+    let {victim, challengeID, drink,perpetrator, contactInfo, taskState, victimName} = req.body
 
 
     if (!mongoose.Types.ObjectId.isValid(id)){
         return res.status(404).json({error: ' No such donation'})
     }
 
+    if(!perpetrator) {
+        perpetrator = "Anonymous"
+    }
 
     const donation = await Donation.findOneAndUpdate({_id: id}, {
-        victim, challengeId, drink, perpetrator, contactInfo, taskState, victimName
+        victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName
     }).populate("challengeID")
-
+    console.log(perpetrator)
     if (!donation) {
         return res.status(404).json({error: 'No such donation'})
     }
