@@ -8,6 +8,7 @@ import { createLazyFileRoute } from "@tanstack/react-router";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import twint from "@/assets/logo-twint.png";
 
 export const Route = createLazyFileRoute("/payment")({
   component: PaymentRoute,
@@ -22,6 +23,7 @@ const CreateDonationRequestBodySchema = z.object({
   contactInfo: z.string().email(),
   taskState: z.enum(["open"]),
   victimName: z.string().min(3),
+  price: z.number().positive(),
 });
 
 function PaymentRoute() {
@@ -77,10 +79,13 @@ function PaymentRoute() {
                   taskState: "open",
                   victim: victim.email,
                   victimName: victim.name,
+                  price: drink.price,
                 });
               })}
               className="w-full space-y-6"
             >
+              <img src={twint} alt="" className="mx-auto -my-4 max-w-[250px]" />
+
               <div className="bg-black text-white text-4xl font-semibold py-6">
                 CHF {drink.price.toFixed(2)}
               </div>
@@ -93,10 +98,10 @@ function PaymentRoute() {
 
               <p>Enter the code in your TWINT app:</p>
 
-              <div className="w-full flex gap-2 max-w-[500px] items-stretch justify-stretch">
+              <div className="w-full flex gap-2 items-stretch justify-stretch">
                 {[0, 1, 5, 3, 8].map((i) => (
                   <div
-                    className="bg-gray-300 px-4 py-3 text-2xl flex-1"
+                    className="bg-gray-300 px-4 py-5 text-2xl flex-1"
                     key={i}
                   >
                     {i}

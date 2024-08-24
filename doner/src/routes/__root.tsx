@@ -57,7 +57,7 @@ export default function Root() {
           <div className="bubble"></div>
         </div>
 
-        <div className="overflow-x-hidden overflow-y-auto h-screen">
+        <div className="overflow-x-hidden overflow-y-auto h-screen pb-10">
           <Outlet />
         </div>
 

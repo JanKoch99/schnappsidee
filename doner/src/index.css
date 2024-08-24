@@ -68,6 +68,10 @@
   }
 }
 
+body, html {
+  overflow: hidden;
+}
+
 .wave {
   animation-duration: 2s;
   animation-fill-mode: forwards;
@@ -120,6 +124,13 @@
 
 .beer {
   top: calc(30% + 32px);
+}
+
+/* XS Screen */
+@media (max-width: 640px) {
+  .beer {
+    top: calc(30% + 16px);
+  }
 }
 
 .bubble {
