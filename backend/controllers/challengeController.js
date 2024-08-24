@@ -23,14 +23,14 @@ const getChallenge = async (req,res) => {
 }
 // create new challenge
 const createChallenge = async (req, res) => {
-    const {task, difficulty} = req.body
+    let {task, difficulty} = req.body
     let emptyFields = []
 
     if(!task) {
-        emptyFields.push('victim')
+        emptyFields.push('task')
     }
     if(!difficulty) {
-        emptyFields.push('task')
+        difficulty = 0
     }
 
     if(emptyFields.length > 0){
@@ -38,7 +38,7 @@ const createChallenge = async (req, res) => {
     }
     //add doc to db
     try {
-        const challenge = await  Challenge.create({task, difficulty});
+        const challenge = await Challenge.create({task, difficulty});
         res.status(200).json(challenge)
     } catch (error) {
         res.status(400).json({error: error.message})
