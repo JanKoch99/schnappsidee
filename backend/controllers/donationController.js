@@ -65,9 +65,6 @@ const createDonation = async (req, res) => {
     if(!perpetrator) {
         perpetrator = "Anonymous"
     }
-    if(!contactInfo) {
-        emptyFields.push('contactInfo')
-    }
     if(!taskState) {
         emptyFields.push('taskState')
     }
@@ -153,38 +150,58 @@ const updateDonation = async (req,res) =>{
     }
 
 
-    if(taskState === 'inProgress'){
+    async function sendSlackMessage(isTable, email, webhookMessage) {
 
         try {
-            const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
-            const slackApiToken = process.env.SLACK_API_TOKEN;
+            let userID;
+            if (!isTable) {
+                const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${email}`;
+                const slackApiToken = process.env.SLACK_API_TOKEN;
 
-            const response = await axios.get(slackApiUrl, {
-                headers: {
-                    'Authorization': `Bearer ${slackApiToken}`
+                const response = await axios.get(slackApiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${slackApiToken}`
+                    }
+                })
+
+                if (!response.data.ok) {
+                    return res.status(400).send(response.data)
                 }
-            })
-
-            if (!response.data.ok) {
-                return res.status(400).send(response.data)
+                userID = response.data.user.id
             }
-            const userID = response.data.user.id
             await axios.post(process.env.WEBHOOK, {
                 "blocks": [
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": `Hey <@${userID}>,\nyou have been offered a drink by ${perpetrator}. Earn your drink now by simply completing a challenge at <https://veracalma.ch/|VeraCalma> at the <https://maps.app.goo.gl/M6paQkdfdJ1EE9Y77|following address>.`
+                            "text": `Hey ${isTable ? `<@${userID}>` : perpetrator }, ${webhookMessage}`
                         }
                     },
                 ]
             });
 
         } catch (error) {
-                console.error('Error sending message:', error);
-                res.status(500).send('Internal Server Error');
+            console.error('Error sending message:', error);
+            res.status(500).send('Internal Server Error');
         }
+
+        return userID;
+    }
+
+    if(taskState === 'inProgress') {
+
+        //message for victim
+        let webhookMessage = `\nyou have been offered a drink by ${perpetrator}. Earn your drink now by simply completing a challenge at <https://veracalma.ch/|VeraCalma> at the <https://maps.app.goo.gl/M6paQkdfdJ1EE9Y77|following address>.`
+        
+        const victimUser = sendSlackMessage(contactInfo, victim, webhookMessage)
+
+        if (!contactInfo){
+            //message for perpetrator
+            webhookMessage = `\n your challenge for <@${victimUser} has been released. Open your eyes wide and enjoy the show ;)`
+            const perpetratorResult = sendSlackMessage(contactInfo, contactInfo, webhookMessage)
+        }
+
     }
     if(taskState === 'done'){
 
@@ -202,6 +219,7 @@ const updateDonation = async (req,res) =>{
                 return res.status(400).send(response.data)
             }
             const userID = response.data.user.id
+            const address =
             await axios.post(process.env.WEBHOOK, {
                 "blocks": [
                     {

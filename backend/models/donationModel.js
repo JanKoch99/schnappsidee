@@ -24,7 +24,7 @@ const donationSchema = new Schema({
     },
     contactInfo: {
         type: String,
-        required: true
+        required: false
     },
     taskState: {
         type: String,
