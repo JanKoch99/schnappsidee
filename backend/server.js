@@ -18,6 +18,35 @@ app.use((req,res,next) =>  {
     next()
 })
 
+
+// Array zum Speichern der verbundenen Clients
+let clients = [];
+
+const broadcastEvent = (event) => {
+    clients.forEach(client => {
+        client.write(`data: ${JSON.stringify(event)}\n\n`);
+    });
+};
+app.use((req, res, next) => {
+    req.broadcastEvent = broadcastEvent;
+    next();
+});
+// SSE-Route
+app.get('/events', (req, res) => {
+    res.setHeader('Content-Type', 'text/event-stream');
+    res.setHeader('Cache-Control', 'no-cache');
+    res.setHeader('Connection', 'keep-alive');
+
+    // Einen neuen Client hinzufügen
+    clients.push(res);
+
+    // Verbindung wird geschlossen, wenn der Client abbricht
+    req.on('close', () => {
+        clients = clients.filter(client => client !== res);
+    });
+});
+
+
 // routes
 app.use('/api/donations', donationRoutes)
 app.use('/api/challenges', challengeRoutes)

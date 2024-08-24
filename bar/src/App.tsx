@@ -31,9 +31,33 @@ function App() {
               setDonations(json as Donation[]);
           }
       }
-
       fetchDonations();
+
   }, [URL]);
+    useEffect(() => {
+
+        const eventSource = new EventSource(`${URL}/events`);
+        eventSource.onmessage = function (event) {
+            const newDonation = JSON.parse(event.data);
+            console.log(newDonation)
+            setOpenDonations((prevOpenDonations) => {
+                if (!prevOpenDonations.some((donation) => donation._id === newDonation._id)) {
+                    return [...prevOpenDonations, newDonation];
+                }
+                return prevOpenDonations;
+            });
+
+            /*setDonations((prevDonations) => {
+                if (!prevDonations.some((donation) => donation._id === newDonation._id)) {
+                    return [...prevDonations, newDonation];
+                }
+                return prevDonations;
+            });*/
+        }
+        return () => {
+            eventSource.close()
+        }
+    }, []);
 
   useEffect(() => {
       if (donations.length > 0) {
@@ -70,6 +94,7 @@ function App() {
 
   const updateDonation = async (donation: Donation, taskState: string) => {
       donation.taskState = taskState;
+
       const response = await fetch(`${URL}/api/donations/${donation._id}`, {
           method: "PATCH",
           body: JSON.stringify(donation),
@@ -217,7 +242,7 @@ function App() {
                               </DialogTrigger>
                               <DialogContent className="sm:max-w-[425px]">
                                   <DialogHeader>
-                                      <DialogTitle>Did {donation.victimName} successfully finished the
+                                      <DialogTitle>Did {donation.victimName} successfully finish the
                                           challenge?</DialogTitle>
                                   </DialogHeader>
                                   <div className="flex gap-4 py-4 justify-center">

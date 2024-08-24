@@ -77,8 +77,21 @@ const createDonation = async (req, res) => {
     }
     //add doc to db
     try {
-        const donation = await  Donation.create({victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName});
-        res.status(200).json(donation)
+        const donation = await Donation.create({victim, challengeID, drink, perpetrator, contactInfo, taskState, victimName});
+        const populatedDonation = await Donation.findById(donation._id).populate("challengeID")
+        const formattedDonation = {
+            _id: populatedDonation._id,
+            victim: populatedDonation.victim,
+            task: populatedDonation.challengeID.task,
+            drink: populatedDonation.drink,
+            perpetrator: populatedDonation.perpetrator,
+            contactInfo: populatedDonation.contactInfo,
+            taskState: populatedDonation.taskState,
+            victimName: populatedDonation.victimName,
+            difficulty: populatedDonation.challengeID.difficulty,
+        }
+        req.broadcastEvent(formattedDonation)
+        res.status(200).json(formattedDonation)
     } catch (error) {
         res.status(400).json({error: error.message})
     }
