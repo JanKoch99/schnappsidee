@@ -70,8 +70,8 @@ function PerpetratorRoute() {
           mutation.mutate({
             drink,
             challengeID: challenge,
-            contactInfo: perpetrator.email,
-            perpetrator: perpetrator.name,
+            contactInfo: values.email,
+            perpetrator: values.name,
             taskState: "open",
             victim: victim.email,
             victimName: victim.name,
