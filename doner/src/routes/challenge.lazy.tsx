@@ -18,7 +18,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { QueryFunction, useMutation, useQuery } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import {config} from "@/Constants.js.ts";
+import { config } from "@/Constants.js.ts";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -174,7 +174,12 @@ function ChallengeRoute() {
                     <FormControl>
                       <div className="flex gap-4">
                         Easy
-                        <Slider max={2} step={1} defaultValue={[field.value]} />
+                        <Slider
+                          max={2}
+                          step={1}
+                          defaultValue={[field.value]}
+                          onValueChange={(e) => field.onChange(Number(e))}
+                        />
                         Hard
                       </div>
                     </FormControl>

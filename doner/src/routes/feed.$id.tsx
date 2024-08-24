@@ -1,14 +1,14 @@
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { createLazyFileRoute } from "@tanstack/react-router";
+import { config } from "@/Constants.js.ts";
+import { createFileRoute } from "@tanstack/react-router";
 import clsx from "clsx";
+import { type Moment } from "moment";
 import { useState } from "react";
 import { z } from "zod";
 import { CreateDonationRequestBodySchema } from "./payment.lazy";
-import { type Moment } from "moment";
-import {config} from "@/Constants.js.ts";
-const URL: string =config.url;
+const URL: string = config.url;
 
-export const Route = createLazyFileRoute("/feed")({
+export const Route = createFileRoute("/feed/$id")({
   component: FeedRoute,
 });
 
@@ -21,9 +21,10 @@ type TimelineEvent = {
 } & z.infer<typeof CreateDonationRequestBodySchema>;
 
 function FeedRoute() {
+  const { id } = Route.useParams<{ id: string }>();
   const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
   //TODO: Michael please help ! ! ! or else . . .
-  const eventSource = new EventSource(`${URL}/events/${SOMETHINGSOMETHING._id}`);
+  const eventSource = new EventSource(`${URL}/events/${id}`);
   eventSource.onmessage = function (event) {
     const newDonation = JSON.parse(event.data);
     console.log(newDonation);
@@ -37,7 +38,7 @@ function FeedRoute() {
           Thanks for spreading the cheers!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          Your donation has been sent. Keep spreading the cheers!
+          Your donation has been sent. Keep spreading the cheers! {id}
         </p>
       </div>
 

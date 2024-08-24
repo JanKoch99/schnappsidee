@@ -97,7 +97,7 @@ const createDonation = async (req, res) => {
             difficulty: populatedDonation.challengeID.difficulty,
             price: populatedDonation.price
         }
-        req.broadcastEventById(formattedDonation)
+        req.broadcastEventById(populatedDonation._id, formattedDonation)
         res.status(200).json(formattedDonation)
     } catch (error) {
         res.status(400).json({error: error.message})
@@ -253,7 +253,7 @@ const updateDonation = async (req,res) =>{
         }
     }
 
-    req.broadcastEventById(formattedDonation)
+    req.broadcastEventById(formattedDonation._id, formattedDonation)
     res.status(200).json(formattedDonation)
 }
 

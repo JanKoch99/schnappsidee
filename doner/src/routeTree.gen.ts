@@ -13,12 +13,12 @@ import { createFileRoute } from '@tanstack/react-router'
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as FeedIdImport } from './routes/feed.$id'
 
 // Create Virtual Routes
 
 const PerpetratorLazyImport = createFileRoute('/perpetrator')()
 const PaymentLazyImport = createFileRoute('/payment')()
-const FeedLazyImport = createFileRoute('/feed')()
 const DrinkLazyImport = createFileRoute('/drink')()
 const ChallengeLazyImport = createFileRoute('/challenge')()
 const IndexLazyImport = createFileRoute('/')()
@@ -35,11 +35,6 @@ const PaymentLazyRoute = PaymentLazyImport.update({
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/payment.lazy').then((d) => d.Route))
 
-const FeedLazyRoute = FeedLazyImport.update({
-  path: '/feed',
-  getParentRoute: () => rootRoute,
-} as any).lazy(() => import('./routes/feed.lazy').then((d) => d.Route))
-
 const DrinkLazyRoute = DrinkLazyImport.update({
   path: '/drink',
   getParentRoute: () => rootRoute,
@@ -54,6 +49,11 @@ const IndexLazyRoute = IndexLazyImport.update({
   path: '/',
   getParentRoute: () => rootRoute,
 } as any).lazy(() => import('./routes/index.lazy').then((d) => d.Route))
+
+const FeedIdRoute = FeedIdImport.update({
+  path: '/feed/$id',
+  getParentRoute: () => rootRoute,
+} as any)
 
 // Populate the FileRoutesByPath interface
 
@@ -80,13 +80,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DrinkLazyImport
       parentRoute: typeof rootRoute
     }
-    '/feed': {
-      id: '/feed'
-      path: '/feed'
-      fullPath: '/feed'
-      preLoaderRoute: typeof FeedLazyImport
-      parentRoute: typeof rootRoute
-    }
     '/payment': {
       id: '/payment'
       path: '/payment'
@@ -101,6 +94,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PerpetratorLazyImport
       parentRoute: typeof rootRoute
     }
+    '/feed/$id': {
+      id: '/feed/$id'
+      path: '/feed/$id'
+      fullPath: '/feed/$id'
+      preLoaderRoute: typeof FeedIdImport
+      parentRoute: typeof rootRoute
+    }
   }
 }
 
@@ -110,9 +110,9 @@ export const routeTree = rootRoute.addChildren({
   IndexLazyRoute,
   ChallengeLazyRoute,
   DrinkLazyRoute,
-  FeedLazyRoute,
   PaymentLazyRoute,
   PerpetratorLazyRoute,
+  FeedIdRoute,
 })
 
 /* prettier-ignore-end */
@@ -126,9 +126,9 @@ export const routeTree = rootRoute.addChildren({
         "/",
         "/challenge",
         "/drink",
-        "/feed",
         "/payment",
-        "/perpetrator"
+        "/perpetrator",
+        "/feed/$id"
       ]
     },
     "/": {
@@ -140,14 +140,14 @@ export const routeTree = rootRoute.addChildren({
     "/drink": {
       "filePath": "drink.lazy.tsx"
     },
-    "/feed": {
-      "filePath": "feed.lazy.tsx"
-    },
     "/payment": {
       "filePath": "payment.lazy.tsx"
     },
     "/perpetrator": {
       "filePath": "perpetrator.lazy.tsx"
+    },
+    "/feed/$id": {
+      "filePath": "feed.$id.tsx"
     }
   }
 }

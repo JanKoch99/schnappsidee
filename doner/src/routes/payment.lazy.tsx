@@ -56,7 +56,7 @@ function PaymentRoute() {
   }
 
   if (mutation.isSuccess) {
-    navigate({ to: "/feed" });
+    navigate({ to: "/feed/$id", params: { id: mutation.data.data._id } });
   }
 
   if (mutation.isError) {
