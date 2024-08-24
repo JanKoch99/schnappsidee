@@ -2,7 +2,7 @@ import './App.css'
 import {Table, TableBody, TableHeader, TableRow} from "@/components/ui/table.tsx";
 import {useState} from "react";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faCircleCheck, faCircleXmark, faCircleArrowRight, faFaceMeh, faFaceSmile, faFaceFrown, faDumbbell} from "@fortawesome/free-solid-svg-icons";
+import {faCircleCheck, faCircleXmark, faCircleArrowRight, faDumbbell} from "@fortawesome/free-solid-svg-icons";
 import {
     Dialog, DialogClose,
     DialogContent,
@@ -12,53 +12,72 @@ import {
     DialogTrigger,
 } from "@/components/ui/dialog"
 import {Card} from "@/components/ui/card.tsx";
+import {Donation} from "@/models/Donation.tsx";
 
 function App() {
-  const [openDonations, setOpenDonations] = useState([
+  const [openDonations, setOpenDonations] = useState<Donation[]>([
       {
-          task: "Liegestützen",
-          drink: "Pepsi",
-          victimName: "Jan",
-          difficulty: 0
+          id: '1',
+          victim: 'alessio',
+          task: 'breakdance',
+          drink: 'sirup',
+          perpetrator: 'chasperli',
+          contactInfo: 'chasperli@email.com',
+          taskState: 'open',
+          victimName: 'Alessio',
+          createdAt: new Date('2024-08-23T12:00:00Z'),
+          difficulty: 3
       },
       {
-          task: "Kniebeugen",
-          drink: "Schanpps",
-          victimName: "Jan2",
+          id: '2',
+          victim: 'mario',
+          task: 'juggle',
+          drink: 'water',
+          perpetrator: 'frankie',
+          contactInfo: 'frankie@email.com',
+          taskState: 'inProgress',
+          victimName: 'Mario',
+          createdAt: new Date('2024-08-22T09:30:00Z'),
+          difficulty: 4
+      },
+      {
+          id: '3',
+          victim: 'luigi',
+          task: 'sing',
+          drink: 'juice',
+          perpetrator: 'luisa',
+          contactInfo: 'luisa@email.com',
+          taskState: 'done',
+          victimName: 'Luigi',
+          createdAt: new Date('2024-08-21T15:45:00Z'),
           difficulty: 2
-      },
-      {
-          task: "Spaghat",
-          drink: "Vodka",
-          victimName: "Michael",
-          difficulty: 1
       }
   ]);
-  const [inProgressDonations, setInProgressDonations] = useState([]);
-  const [doneDonations, setDoneDonations] = useState([]);
-  const [abortDonations, setAbortDonations] = useState([]);
+  const [inProgressDonations, setInProgressDonations] = useState<Donation[]>([]);
+  const [doneDonations, setDoneDonations] = useState<Donation[]>([]);
+  const [abortDonations, setAbortDonations] = useState<Donation[]>([]);
 
-  const setToProgress = (donation) => {
+  const setToProgress = (donation: Donation) => {
       setOpenDonations(openDonations.filter(openDonation => openDonation != donation));
       setInProgressDonations(inProgressDonations.concat(donation));
   }
 
-  const abortOpen = (donation) => {
+  const abortOpen = (donation: Donation) => {
       setOpenDonations(openDonations.filter(openDonation => openDonation != donation));
 
   }
 
-  const abortInProgress = (donation) => {
+  const abortInProgress = (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setAbortDonations(abortDonations.concat(donation));
   }
 
-  const setToDone = (donation) => {
+  const setToDone = (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setDoneDonations(doneDonations.concat(donation));
   }
 
-  const getSize = (donation) => {
+  const getSize = (donation: Donation) => {
       if (donation.difficulty === 0) {
           return "1x";
       }
@@ -68,7 +87,7 @@ function App() {
       return "2x";
   }
 
-  const getColor = (donation) => {
+  const getColor = (donation: Donation) => {
       if (donation.difficulty === 0) {
           return "green";
       }
@@ -90,7 +109,7 @@ function App() {
                       </TableRow>
                   </TableHeader>
                   <TableBody>
-                      {openDonations.length > 0 && openDonations.map((donation, index) => (
+                      {openDonations.length > 0 && openDonations.map((donation: Donation, index: number) => (
                               <Dialog key={index}>
                                   <DialogTrigger asChild>
                                       <Card className="flex w-full my-4">
