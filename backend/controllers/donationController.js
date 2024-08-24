@@ -179,6 +179,72 @@ const updateDonation = async (req,res) =>{
                 res.status(500).send('Internal Server Error');
         }
     }
+    if(taskState === 'done'){
+
+        try {
+            const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
+            const slackApiToken = process.env.SLACK_API_TOKEN;
+
+            const response = await axios.get(slackApiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${slackApiToken}`
+                }
+            })
+
+            if (!response.data.ok) {
+                return res.status(400).send(response.data)
+            }
+            const userID = response.data.user.id
+            await axios.post(process.env.WEBHOOK, {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `<@${userID}> great performance!\nYou have earned your special drink, enjoy :beers:!`
+                        }
+                    },
+                ]
+            });
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    }
+    if(taskState === 'chicken'){
+
+        try {
+            const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
+            const slackApiToken = process.env.SLACK_API_TOKEN;
+
+            const response = await axios.get(slackApiUrl, {
+                headers: {
+                    'Authorization': `Bearer ${slackApiToken}`
+                }
+            })
+
+            if (!response.data.ok) {
+                return res.status(400).send(response.data)
+            }
+            const userID = response.data.user.id
+            await axios.post(process.env.WEBHOOK, {
+                "blocks": [
+                    {
+                        "type": "section",
+                        "text": {
+                            "type": "mrkdwn",
+                            "text": `<@${userID}>, chickened out :chicken:!`
+                        }
+                    },
+                ]
+            });
+
+        } catch (error) {
+            console.error('Error sending message:', error);
+            res.status(500).send('Internal Server Error');
+        }
+    }
 
 
     res.status(200).json(formattedDonation)
