@@ -14,6 +14,7 @@ import {
 import {Card} from "@/components/ui/card.tsx";
 import {Donation} from "@/models/Donation.tsx";
 import {config} from "@/Constants.js.ts";
+import confetti, {Shape} from "canvas-confetti";
 
 function App() {
   const [donations, setDonations] = useState<Donation[]>([])
@@ -67,6 +68,7 @@ function App() {
   }, [donations])
 
 
+    //TODO: If new donation is added call:       triggerConfetti(false);
 
   const updateDonation = async (donation: Donation, taskState: string) => {
       donation.taskState = taskState;
@@ -107,6 +109,7 @@ function App() {
   const setToDone = async (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setDoneDonations(doneDonations.concat(donation));
+      triggerConfetti(true);
       await updateDonation(donation, "done");
   }
 
@@ -130,7 +133,57 @@ function App() {
       return "red";
   }
 
-  return (
+    const triggerConfetti = (isMoney: boolean) => {
+        const scalar: number = 7;
+        const shapes: Shape[] = []
+        if (isMoney) {
+            shapes.push(confetti.shapeFromText({text: '💸', scalar: scalar}))
+        } else {
+            shapes.push(confetti.shapeFromText({text: '🍺', scalar: scalar}))
+            shapes.push(confetti.shapeFromText({text: '🍷', scalar: scalar}))
+            shapes.push(confetti.shapeFromText({text: '🍸', scalar: scalar}))
+        }
+
+        const end = Date.now() + 1000; // Confetti duration
+
+        (function frame() {
+
+            confetti({
+                particleCount: 1,
+                angle: 60,
+                spread: 30,
+                origin: { x: 0 },
+                scalar: scalar,
+                shapes: shapes,
+                ticks: 100,
+                gravity: 0.05,
+                zIndex: 2000,
+                startVelocity: 15,
+                disableForReducedMotion: true,
+            });
+
+            confetti({
+                particleCount: 1,
+                angle: 120,
+                spread: 30,
+                origin: { x: 1 },
+                scalar: scalar,
+                shapes: shapes,
+                ticks: 100,
+                gravity: 0.05,
+                zIndex: 2000,
+                startVelocity: 15,
+                disableForReducedMotion: true,
+            });
+
+            if (Date.now() < end) {
+                requestAnimationFrame(frame);
+            }
+        })();
+    };
+
+
+    return (
     <div className="p-10 flex">
           <div className="flex w-full justify-center flex-col">
               {/*TODO: Add bar name*/}
