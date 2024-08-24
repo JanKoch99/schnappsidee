@@ -16,6 +16,7 @@ import {Donation} from "@/models/Donation.tsx";
 import {config} from "@/Constants.js.ts";
 import confetti, {Shape} from "canvas-confetti";
 import chickenSoundUrl from './assets/chickenSound.mp3';
+import TimerManager from "@/helpers/TimerManager.tsx";
 
 
 function App() {
@@ -164,7 +165,7 @@ function App() {
       return "red";
   }
 
-    const triggerConfetti = (emoji: String) => {
+    const triggerConfetti = (emoji: string) => {
         const scalar: number = 7;
         const shapes: Shape[] = []
         if (emoji === "money") {
@@ -215,6 +216,22 @@ function App() {
         })();
     };
 
+  const checkForExpiredTimer = async () => {
+      const now = new Date();
+      for (const donation of donations) {
+        const updatedAt = new Date(donation.updatedAt);
+        const remainingTime = Math.max(0, 60 - ((now.getTime() - updatedAt.getTime()) / 1000 / 60));
+        if (remainingTime <= 0) {
+            if (donation.taskState === "open") {
+                await abortOpen(donation);
+            } else {
+                await abortInProgress(donation);
+            }
+        }
+      }
+  }
+
+    new TimerManager(checkForExpiredTimer);
 
     return (
     <div className="p-10 flex">
@@ -237,6 +254,9 @@ function App() {
                                               <td className="flex justify-between content-center items-center mx-4">
                                                   <div className="text-xl my-4">
                                                       {donation.task}
+                                                  </div>
+                                                  <div className="timer" data-updated-at={donation.updatedAt}>
+                                                      60 min
                                                   </div>
                                                   <div className="flex justify-between items-center">
                                                       <FontAwesomeIcon icon={faDumbbell}
@@ -290,6 +310,9 @@ function App() {
                                           <td className="flex justify-between content-center items-center mx-4">
                                               <div className="text-xl my-4">
                                                   {donation.task}
+                                              </div>
+                                              <div className="timer" data-updated-at={donation.updatedAt}>
+                                                  60 min
                                               </div>
                                               <div className="flex justify-between items-center">
                                                   <FontAwesomeIcon icon={faDumbbell}
