@@ -1,12 +1,11 @@
-import { Challenge } from "@/assets/challenges";
 import { Card } from "@/components/ui/card";
+import { Challenge } from "@/routes/challenge.lazy";
 import { useDonationStore } from "@/stores/donation";
 import clsx from "clsx";
 import React from "react";
 
 const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
-  name,
-  description,
+  task,
   difficulty,
   active,
 }) => {
@@ -20,15 +19,14 @@ const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
 
   return (
     <Card
-      onClick={() => setChallenge(name)}
+      onClick={() => setChallenge(task)}
       className={clsx(
         "w-full h-full p-5 hover:scale-105 hover:cursor-pointer transition-all",
         colors[difficulty],
-        !active && name !== challenge ? "opacity-25" : ""
+        !active && task !== challenge ? "opacity-25" : ""
       )}
     >
-      <h2 className="font-bold">{name}</h2>
-      <p>{description}</p>
+      <h2 className="font-bold">{task}</h2>
     </Card>
   );
 };
