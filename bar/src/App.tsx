@@ -15,6 +15,8 @@ import {Card} from "@/components/ui/card.tsx";
 import {Donation} from "@/models/Donation.tsx";
 import {config} from "@/Constants.js.ts";
 import confetti, {Shape} from "canvas-confetti";
+import chickenSoundUrl from './assets/chickenSound.mp3';
+
 
 function App() {
   const [donations, setDonations] = useState<Donation[]>([])
@@ -23,6 +25,8 @@ function App() {
   const [doneDonations, setDoneDonations] = useState<Donation[]>([]);
   const [abortDonations, setAbortDonations] = useState<Donation[]>([]);
   const URL: string =config.url;
+  const chickenSound = new Audio(chickenSoundUrl);
+
 
   useEffect(() => {
       const fetchDonations = async () => {
@@ -68,7 +72,7 @@ function App() {
   }, [donations])
 
 
-    //TODO: If new donation is added call:       triggerConfetti(false);
+    //TODO: If new donation is added call:       triggerConfetti();
 
   const updateDonation = async (donation: Donation, taskState: string) => {
       donation.taskState = taskState;
@@ -101,15 +105,17 @@ function App() {
   }
 
   const abortInProgress = async (donation: Donation) => {
+      await chickenSound.play();
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setAbortDonations(abortDonations.concat(donation));
       await updateDonation(donation, "chicken");
+      triggerConfetti("chicken");
   }
 
   const setToDone = async (donation: Donation) => {
       setInProgressDonations(inProgressDonations.filter(inProgressDonation => inProgressDonation != donation));
       setDoneDonations(doneDonations.concat(donation));
-      triggerConfetti(true);
+      triggerConfetti("money");
       await updateDonation(donation, "done");
   }
 
@@ -133,11 +139,13 @@ function App() {
       return "red";
   }
 
-    const triggerConfetti = (isMoney: boolean) => {
+    const triggerConfetti = (emoji: String) => {
         const scalar: number = 7;
         const shapes: Shape[] = []
-        if (isMoney) {
+        if (emoji === "money") {
             shapes.push(confetti.shapeFromText({text: '💸', scalar: scalar}))
+        } else if (emoji === "chicken") {
+            shapes.push(confetti.shapeFromText({text: '🪶', scalar: scalar}))
         } else {
             shapes.push(confetti.shapeFromText({text: '🍺', scalar: scalar}))
             shapes.push(confetti.shapeFromText({text: '🍷', scalar: scalar}))
