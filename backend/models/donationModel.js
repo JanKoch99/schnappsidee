@@ -8,8 +8,9 @@ const donationSchema = new Schema({
         type: String,
         required: true
     },
-    task: {
-        type: String,
+    challengeID: {
+        type: Schema.Types.ObjectId,
+        ref: 'Challenge',
         required: true
     },
     drink: {
@@ -32,10 +33,6 @@ const donationSchema = new Schema({
         type: String,
         required: false
     },
-    difficulty: {
-        type: Number,
-        required: true
-    }
 }, { timestamps: true })
 
 module.exports = mongoose.model('Donation', donationSchema)

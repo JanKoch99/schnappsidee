@@ -49,7 +49,7 @@ const createChallenge = async (req, res) => {
 const deleteChallenge = async (req,res) => {
     const id = req.params.id
     if (!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({error: ' No such challenge'})
+        return res.status(404).json({error: 'No such challenge'})
     }
 
     const challenge = await Challenge.findByIdAndDelete({_id: id})
@@ -66,7 +66,7 @@ const updateChallenge = async (req,res) =>{
 
 
     if (!mongoose.Types.ObjectId.isValid(id)){
-        return res.status(404).json({error: ' No such challenge'})
+        return res.status(404).json({error: 'No such challenge'})
     }
 
 
