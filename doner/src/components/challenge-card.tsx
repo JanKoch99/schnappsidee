@@ -5,6 +5,7 @@ import clsx from "clsx";
 import React from "react";
 
 const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
+  _id,
   task,
   difficulty,
   active,
@@ -19,11 +20,11 @@ const ChallengeCard: React.FC<Challenge & { active?: boolean }> = ({
 
   return (
     <Card
-      onClick={() => setChallenge(task)}
+      onClick={() => setChallenge(_id)}
       className={clsx(
         "w-full h-full p-5 hover:scale-105 hover:cursor-pointer transition-all",
         colors[difficulty],
-        !active && task !== challenge ? "opacity-25" : ""
+        !active && _id !== challenge ? "opacity-25" : ""
       )}
     >
       <h2 className="font-bold">{task}</h2>
