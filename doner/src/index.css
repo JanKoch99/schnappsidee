@@ -67,3 +67,122 @@
     @apply bg-background text-foreground;
   }
 }
+/* Custom CSS for random bubbles, confined to the progress bar */
+.beer-fill {
+  background-color: #f4c542; /* Beer color */
+  height: 100%;
+  width: 75%; /* Adjust the width to represent progress */
+  overflow: hidden;
+  border-radius: 0.5rem;
+  position: relative;
+  display: flex; /* Use flex for aligning icon */
+  align-items: center;
+  justify-content: flex-end; /* Push content to the end */
+  padding-right: 12px; /* Add padding for spacing */
+}
+
+.bubbles {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  background-image: radial-gradient(
+      circle at 20% 80%,
+      rgba(255, 255, 255, 0.8) 2%,
+      transparent 5%
+    ),
+    radial-gradient(
+      circle at 30% 60%,
+      rgba(255, 255, 255, 0.7) 3%,
+      transparent 6%
+    ),
+    radial-gradient(
+      circle at 70% 20%,
+      rgba(255, 255, 255, 0.6) 2.5%,
+      transparent 7%
+    ),
+    radial-gradient(
+      circle at 50% 40%,
+      rgba(255, 255, 255, 0.5) 3%,
+      transparent 8%
+    ),
+    radial-gradient(
+      circle at 80% 50%,
+      rgba(255, 255, 255, 0.4) 2.5%,
+      transparent 5%
+    );
+  background-size: 150px 150px; /* Proper bubble size */
+  background-repeat: repeat;
+  opacity: 0.7;
+  animation: bubble-animation 60s infinite; /* Default animation speed */
+}
+
+@keyframes bubble-animation {
+  0% {
+    background-position: 0% 100%;
+  }
+  25% {
+    background-position: 20% 80%;
+  }
+  50% {
+    background-position: 50% 50%;
+  }
+  75% {
+    background-position: 80% 30%;
+  }
+  100% {
+    background-position: 0% 0%;
+  }
+}
+
+.bubble-1 {
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.bubble-2 {
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  animation-duration: 42s; /* Slightly slower animation for variety */
+}
+
+.bubble-3 {
+  animation-timing-function: cubic-bezier(0.6, 0, 0.4, 1);
+  animation-duration: 54s; /* Slightly slower animation for variety */
+}
+
+.bubble-4 {
+  animation-timing-function: cubic-bezier(0.7, 0.2, 0.1, 1);
+  animation-duration: 31s; /* Slightly slower animation for variety */
+}
+
+/* Media query for slower animation on mobile devices */
+@media (max-width: 768px) {
+  .bubbles {
+    animation-duration: 20s; /* Slower animation on mobile */
+  }
+  .bubble-2 {
+    animation-duration: 24s;
+  }
+  .bubble-3 {
+    animation-duration: 28s;
+  }
+  .bubble-4 {
+    animation-duration: 22s;
+  }
+}
+
+/* Style for the beer icon at the end */
+.beer-icon-container {
+  width: 65px;
+  height: 65px;
+  background-color: #f4c542; /* Adjust background for more contrast */
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* More pronounced shadow */
+  margin-left: 10px; /* Space between icon and beer fill */
+}
+
+.beer-icon {
+  font-size: 28px; /* Increase icon size */
+}

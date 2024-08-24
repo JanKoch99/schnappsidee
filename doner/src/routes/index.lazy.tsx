@@ -9,7 +9,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { DonationSchema, useDonationStore } from "@/stores/donation";
+import { useDonationStore, VictimSchema } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
 import { useForm } from "react-hook-form";
@@ -21,12 +21,12 @@ export const Route = createLazyFileRoute("/")({
 
 function VictimForm() {
   const navigate = useNavigate();
-  const { name, phone, setDonation } = useDonationStore();
-  const form = useForm<z.infer<typeof DonationSchema>>({
-    resolver: zodResolver(DonationSchema),
+  const { setVictim, victim } = useDonationStore();
+  const form = useForm<z.infer<typeof VictimSchema>>({
+    resolver: zodResolver(VictimSchema),
     defaultValues: {
-      name,
-      phone,
+      name: victim.name,
+      email: victim.email,
     },
   });
 
@@ -34,21 +34,21 @@ function VictimForm() {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit((values) => {
-          setDonation(values);
+          setVictim(values);
           navigate({ to: "/drink" });
         })}
         className="w-full space-y-6"
       >
         <FormField
           control={form.control}
-          name="phone"
+          name="email"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Phone</FormLabel>
+              <FormLabel>E-Mail</FormLabel>
               <FormControl>
-                <Input autoComplete="tel" {...field} />
+                <Input autoComplete="email" {...field} />
               </FormControl>
-              <FormDescription>Phone number of victim.</FormDescription>
+              <FormDescription>E-Mail of victim.</FormDescription>
               <FormMessage />
             </FormItem>
           )}

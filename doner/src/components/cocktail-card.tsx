@@ -1,11 +1,19 @@
 import { Drink } from "@/assets/drinks";
 import { Card } from "@/components/ui/card";
+import { useDonationStore } from "@/stores/donation";
 import React from "react";
 
-const CocktailCard: React.FC<Drink> = ({ image, name, description, price }) => {
+const CocktailCard: React.FC<Drink & { active?: boolean }> = ({
+  image,
+  name,
+  description,
+  price,
+  active,
+}) => {
+  const { setDrink, drink } = useDonationStore();
   return (
-    <Card>
-      <div className="flex cursor-pointer">
+    <Card className={!active && drink ? "opacity-25" : ""}>
+      <div className="flex cursor-pointer" onClick={() => setDrink(name)}>
         <img
           draggable={false}
           src={image}
