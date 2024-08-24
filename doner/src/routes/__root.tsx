@@ -1,7 +1,7 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/router-devtools";
+import React, { Suspense } from "react";
 
 // Create a client
 const queryClient = new QueryClient();
@@ -11,6 +11,18 @@ export const Route = createRootRoute({
 });
 
 export default function Root() {
+  const TanStackRouterDevtools =
+    process.env.NODE_ENV !== "development"
+      ? () => null // Render nothing in production
+      : React.lazy(() =>
+          // Lazy load in development
+          import("@tanstack/router-devtools").then((res) => ({
+            default: res.TanStackRouterDevtools,
+            // For Embedded Mode
+            // default: res.TanStackRouterDevtoolsPanel
+          }))
+        );
+
   return (
     <QueryClientProvider client={queryClient}>
       <div className="h-full flex flex-col gap-10">
@@ -61,7 +73,9 @@ export default function Root() {
           <Outlet />
         </div>
 
-        <TanStackRouterDevtools />
+        <Suspense>
+          <TanStackRouterDevtools />
+        </Suspense>
       </div>
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
