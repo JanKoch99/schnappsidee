@@ -30,11 +30,14 @@ function Drink() {
             key={index}
             className="group relative"
             onClick={() => {
-              setDrink(d.name);
+              setDrink({
+                name: d.name,
+                price: d.price,
+              });
               navigate({ to: "/challenge" });
             }}
           >
-            <CocktailCard active={drink === d.name} {...d} />
+            <CocktailCard active={drink.name === d.name} {...d} />
           </div>
         ))}
       </div>

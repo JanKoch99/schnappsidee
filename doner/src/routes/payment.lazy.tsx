@@ -1,14 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import { Form } from "@/components/ui/form";
 import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
@@ -78,7 +70,7 @@ function PaymentRoute() {
             <form
               onSubmit={form.handleSubmit((values) => {
                 mutation.mutate({
-                  drink,
+                  drink: drink.name,
                   challengeID: challenge,
                   contactInfo: values.email,
                   perpetrator: values.name,
@@ -89,35 +81,28 @@ function PaymentRoute() {
               })}
               className="w-full space-y-6"
             >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>E-Mail</FormLabel>
-                    <FormControl>
-                      <Input autoComplete="email" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="bg-black text-white text-4xl font-semibold py-6">
+                CHF {drink.price.toFixed(2)}
+              </div>
 
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input autoComplete="name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <Button type="submit" className="bg-black w-full">
+                Open TWINT App
+              </Button>
 
-              <Button type="submit">Hold my 🍺</Button>
+              <hr />
+
+              <p>Enter the code in your TWINT app:</p>
+
+              <div className="w-full flex gap-2 max-w-[500px] items-stretch justify-stretch">
+                {[0, 1, 5, 3, 8].map((i) => (
+                  <div
+                    className="bg-gray-300 px-4 py-3 text-2xl flex-1"
+                    key={i}
+                  >
+                    {i}
+                  </div>
+                ))}
+              </div>
             </form>
           </Form>
         </CardContent>
