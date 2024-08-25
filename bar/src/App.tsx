@@ -40,6 +40,10 @@ function App() {
       }
       fetchDonations();
 
+      const intervalId = setInterval(fetchDonations, 5000);
+
+      return () => clearInterval(intervalId);
+
   }, [URL]);
 
   useEffect(() => {
@@ -277,7 +281,7 @@ function App() {
                                                   </div>
                                                   <div className="flex justify-between items-center">
                                                       <div className="timer" data-updated-at={donation.updatedAt}>
-                                                          {(60 - getRemainingTime(donation)).toFixed(0)}'
+                                                          {(getRemainingTime(donation)).toFixed(0)}'
                                                       </div>
                                                       <FontAwesomeIcon icon={faDumbbell}
                                                                        color={getColor(donation)}
@@ -337,7 +341,7 @@ function App() {
                                               </div>
                                               <div className="flex justify-between items-center">
                                                   <div className="timer" data-updated-at={donation.updatedAt}>
-                                                      {(60 - getRemainingTime(donation)).toFixed(0)}'
+                                                      {(getRemainingTime(donation)).toFixed(0)}'
                                                   </div>
                                                   <FontAwesomeIcon icon={faDumbbell}
                                                                    color={getColor(donation)}

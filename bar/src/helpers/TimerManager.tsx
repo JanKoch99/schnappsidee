@@ -37,7 +37,7 @@ class TimerManager {
         const elapsedMinutes = elapsed / 60; // Convert to minutes
         const minLeft = Math.max(0, 60 - elapsedMinutes); // 60 minutes minus elapsed time
         if (minLeft <= 0) {
-            await this.checkForExpiredTimer();
+            this.checkForExpiredTimer();
         }
         return minLeft;
     }
