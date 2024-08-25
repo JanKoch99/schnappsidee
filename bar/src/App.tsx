@@ -40,6 +40,11 @@ function App() {
       }
       fetchDonations();
 
+      const intervalId = setInterval(fetchDonations, 5000);
+
+      // Cleanup function to clear the interval when component unmounts or URL changes
+      return () => clearInterval(intervalId);
+
   }, [URL]);
 
   useEffect(() => {
