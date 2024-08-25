@@ -256,7 +256,7 @@ function App() {
 
     return (
     <div className="p-10 flex">
-          <div className="flex w-full justify-center flex-col">
+          <div className="flex w-full justify-center flex-col lg:mx-64">
               <h1 className="text-4xl font-bold">vera calma</h1>
               {/*All open donations*/}
               <Table className="mt-5">

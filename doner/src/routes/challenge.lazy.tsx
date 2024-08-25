@@ -53,7 +53,7 @@ const fetchChallenges: QueryFunction<Challenge[], string[], never> = () =>
 function ChallengeRoute() {
   const navigate = useNavigate();
   const { victim, drink } = useDonationStore();
-  if (!victim.name || !victim.email) {
+  if (!victim.name) {
     navigate({ to: "/" });
   }
 

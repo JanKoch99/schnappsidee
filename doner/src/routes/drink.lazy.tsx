@@ -10,7 +10,7 @@ export const Route = createLazyFileRoute("/drink")({
 function Drink() {
   const navigate = useNavigate();
   const { victim, drink, setDrink } = useDonationStore();
-  if (!victim.name || !victim.email) {
+  if (!victim.name) {
     navigate({ to: "/" });
   }
 

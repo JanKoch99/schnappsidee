@@ -27,7 +27,6 @@ function VictimForm() {
     resolver: zodResolver(PersonSchema),
     defaultValues: {
       name: victim.name,
-      email: victim.email,
     },
   });
 
@@ -49,7 +48,11 @@ function VictimForm() {
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit((values) => {
-                setVictim(values);
+                if (values.email) {
+                    setVictim(values);
+                } else {
+                    setVictim({name: "Table " + values.name})
+                }
                 navigate({ to: "/drink" });
               })}
               className="w-full space-y-6"
@@ -97,18 +100,6 @@ function VictimForm() {
                         <FormLabel>Table</FormLabel>
                         <FormControl>
                           <Input autoComplete="name" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input type="hidden" {...field} />
                         </FormControl>
                         <FormMessage />
                       </FormItem>

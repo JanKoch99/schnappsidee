@@ -3,9 +3,9 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 export const PersonSchema = z.object({
-  email: z.string().email(),
-  name: z.string().regex(/^[a-zA-Z\s.]{3,}$/, {
-    message: "Are you kidding me? That's the name of your victim?",
+  email: z.string().email().optional(),
+  name: z.string().regex(/^[a-zA-Z0-9\s.]{1,}$/, {
+    message: "Are you kidding me? That's your chosen name?",
   }),
 });
 
