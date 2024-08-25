@@ -91,10 +91,10 @@ function PaymentRoute() {
                 mutation.mutate({
                   drink: drink.name,
                   challengeID: challenge,
-                  contactInfo: values.email,
+                  contactInfo: values.email!,
                   perpetrator: values.name,
                   taskState: "open",
-                  victim: victim.email,
+                  victim: victim.email!,
                   victimName: victim.name,
                   price: drink.price,
                 });
