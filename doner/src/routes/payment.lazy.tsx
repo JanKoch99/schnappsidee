@@ -2,14 +2,19 @@ import twint from "@/assets/logo-twint.png";
 import Spinner from "@/components/spinner";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Form } from "@/components/ui/form";
+import { config } from "@/Constants.js.ts";
 import { PersonSchema, useDonationStore } from "@/stores/donation";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { CheckIcon, ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import { useMutation } from "@tanstack/react-query";
 import { createLazyFileRoute, useNavigate } from "@tanstack/react-router";
-import { config } from "@/Constants.js.ts";
 import axios from "axios";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
@@ -32,7 +37,15 @@ export const CreateDonationRequestBodySchema = z.object({
 const URL: string = config.url;
 function PaymentRoute() {
   const navigate = useNavigate();
-  const { perpetrator, victim, drink, challenge } = useDonationStore();
+  const {
+    perpetrator,
+    victim,
+    drink,
+    challenge,
+    setVictim,
+    setDrink,
+    setChallenge,
+  } = useDonationStore();
   const form = useForm<z.infer<typeof PersonSchema>>({
     resolver: zodResolver(PersonSchema),
     defaultValues: {
@@ -56,7 +69,55 @@ function PaymentRoute() {
   }
 
   if (mutation.isSuccess) {
-    navigate({ to: "/feed/$id", params: { id: mutation.data.data._id } });
+    return (
+      <div className="mx-auto max-w-2xl text-center">
+        <div className="px-6 py-24 sm:px-6 sm:py-32 lg:px-8">
+          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+            Thanks!
+          </h2>
+          <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
+            You're a good person. 🥰
+          </p>
+        </div>
+        <Card className="m-10 items-center justify-center gap-x-6">
+          <CardHeader></CardHeader>
+          <CardContent>
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-green-100">
+              <CheckIcon
+                aria-hidden="true"
+                className="h-6 w-6 text-green-600"
+              />
+            </div>
+            <div className="mt-3 text-center sm:mt-5">
+              <h3 className="text-base font-semibold leading-6 text-gray-900">
+                Payment successful
+              </h3>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500">
+                  We've sent your request to the bar. If the bar accepts, you'll
+                  receive a notification.
+                </p>
+              </div>
+            </div>
+          </CardContent>
+          <CardFooter className="flex justify-center">
+            <Button
+              onClick={() => {
+                // reset forms
+                setVictim({ name: "", email: "" });
+                setDrink({ name: "", price: 0 });
+                setChallenge("null");
+
+                navigate({ to: "/" });
+              }}
+            >
+              Send another one! 🍹
+            </Button>
+          </CardFooter>
+        </Card>
+      </div>
+    );
+    // navigate({ to: "/feed/$id", params: { id: mutation.data.data._id } });
   }
 
   if (mutation.isError) {
