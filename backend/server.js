@@ -23,8 +23,11 @@ app.use((req,res,next) =>  {
 
 // Broadcast function
 const broadcastEventById = (id, event) => {
+    console.log("Broadcasting event", event);
     if (clientsById[id]) {
+        console.log(`Broadcasting event to ${clientsById[id].length} clients`);
         clientsById[id].forEach(client => {
+            console.log("sending event to client");
             client.write(`data: ${JSON.stringify(event)}\n\n`);
         });
     }

@@ -1,11 +1,17 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { config } from "@/Constants.js.ts";
-import { createFileRoute } from "@tanstack/react-router";
+import { useDonationStore } from "@/stores/donation";
+import { CheckCircledIcon, CrossCircledIcon } from "@radix-ui/react-icons";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import clsx from "clsx";
-import { type Moment } from "moment";
-import { useState } from "react";
-import { z } from "zod";
-import { CreateDonationRequestBodySchema } from "./payment.lazy";
+import moment, { type Moment } from "moment";
+import { useEffect, useState } from "react";
 const URL: string = config.url;
 
 export const Route = createFileRoute("/feed/$id")({
@@ -16,20 +22,95 @@ type TimelineEvent = {
   _id: string;
   text: string;
   date: Moment;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  background: "bg-green-500" | "bg-blue-500";
-} & z.infer<typeof CreateDonationRequestBodySchema>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  icon: any;
+  background: "bg-green-500" | "bg-blue-500" | "bg-yellow-500" | "bg-red-500";
+  type: "open" | "inProgress" | "done" | "chicken";
+};
 
 function FeedRoute() {
   const { id } = Route.useParams<{ id: string }>();
-  const [timeline, setTimeline] = useState<TimelineEvent[]>([]);
-  //TODO: Michael please help ! ! ! or else . . .
-  const eventSource = new EventSource(`${URL}/events/${id}`);
-  eventSource.onmessage = function (event) {
-    const newDonation = JSON.parse(event.data);
-    console.log(newDonation);
-    setTimeline((timeline) => [...timeline, newDonation]);
-  };
+  const { setVictim, setDrink, setChallenge, drink, victim } =
+    useDonationStore();
+  const navigate = useNavigate();
+  const [timeline, setTimeline] = useState<TimelineEvent[]>([
+    {
+      _id: "1",
+      text: "The bar has received your donation offer.",
+      date: moment(),
+      icon: CheckCircledIcon,
+      background: "bg-blue-500",
+      type: "open",
+    },
+  ]);
+
+  useEffect(() => {
+    const eventSource = new EventSource(`${URL}/events/${id}`);
+    eventSource.onmessage = function (event) {
+      const newDonation = JSON.parse(event.data) as {
+        createdAt: string;
+        drink: string;
+        perpetrator: string;
+        victim: string;
+        price: number;
+        taskState: "done" | "inProgress" | "open" | "chicken";
+        updatedAt: string;
+      };
+
+      let text: string;
+      let background:
+        | "bg-green-500"
+        | "bg-blue-500"
+        | "bg-yellow-500"
+        | "bg-red-500";
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      let icon: any;
+      switch (newDonation.taskState) {
+        case "inProgress":
+          text = `The bar has accepted your donation offer for ${drink.name}.`;
+          background = "bg-yellow-500";
+          icon = CheckCircledIcon;
+          break;
+        case "done":
+          text = `${victim.name} rocked the challenge and received your donation offer for ${drink.name}.`;
+          background = "bg-green-500";
+          icon = CheckCircledIcon;
+          break;
+        case "chicken":
+          text = `${victim.name} chickened out of the challenge and your donation offer for ${drink.name} was rejected.`;
+          background = "bg-red-500";
+          icon = CrossCircledIcon;
+          break;
+        case "open":
+          background = "bg-blue-500";
+          icon = CheckCircledIcon;
+          text = `The bar has received your donation offer for ${drink.name}.`;
+          break;
+        default:
+          text = `Oops, something went wrong with your donation offer for ${drink.name}.`;
+          background = "bg-red-500";
+          icon = CrossCircledIcon;
+          break;
+      }
+
+      if (timeline.findIndex((e) => newDonation.taskState === e.type) === -1) {
+        setTimeline((timeline) => [
+          ...timeline,
+          {
+            _id: newDonation.drink + "-" + newDonation.updatedAt,
+            text,
+            date: moment(newDonation.updatedAt),
+            icon,
+            background,
+            type: newDonation.taskState,
+          },
+        ]);
+      }
+    };
+    return () => {
+      eventSource.close();
+    };
+  }, [id]);
 
   return (
     <div className="mx-auto max-w-2xl text-center">
@@ -38,17 +119,19 @@ function FeedRoute() {
           Thanks for spreading the cheers!
         </h2>
         <p className="mx-auto mt-6 max-w-xl text-lg leading-8 text-gray-600">
-          Your donation has been sent. Keep spreading the cheers! {id}
+          Your donation has been sent. Keep spreading the cheers!
+          <br />
+          <span className="font-mono text-sm">{id}</span>
         </p>
       </div>
 
       <Card className="m-10 items-center justify-center gap-x-6">
         <CardHeader></CardHeader>
         <CardContent>
-          <div className="flow-root">
+          <div className="flow-root min-h-72">
             <ul role="list" className="-mb-8">
               {timeline.map((event, eventIdx) => (
-                <li key={event._id}>
+                <li key={event._id + eventIdx}>
                   <div className="relative pb-8">
                     {eventIdx !== timeline.length - 1 ? (
                       <span
@@ -72,7 +155,9 @@ function FeedRoute() {
                       </div>
                       <div className="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                         <div>
-                          <p className="text-sm text-gray-500">{event.text} </p>
+                          <p className="text-sm text-gray-500 text-left">
+                            {event.text}
+                          </p>
                         </div>
                         <div className="whitespace-nowrap text-right text-sm text-gray-500">
                           <time
@@ -89,6 +174,21 @@ function FeedRoute() {
             </ul>
           </div>
         </CardContent>
+        <CardFooter className="flex justify-center">
+          <hr />
+          <Button
+            onClick={() => {
+              // reset forms
+              setVictim({ name: "", email: "" });
+              setDrink({ name: "", price: 0 });
+              setChallenge("null");
+
+              navigate({ to: "/" });
+            }}
+          >
+            Send another one! 🍹
+          </Button>
+        </CardFooter>
       </Card>
     </div>
   );

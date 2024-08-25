@@ -100,7 +100,17 @@ function PaymentRoute() {
               </div>
             </div>
           </CardContent>
-          <CardFooter className="flex justify-center">
+          <CardFooter className="flex justify-center gap-4">
+            <Button
+              onClick={() => {
+                navigate({
+                  to: "/feed/$id",
+                  params: { id: mutation.data.data._id },
+                });
+              }}
+            >
+              Status
+            </Button>
             <Button
               onClick={() => {
                 // reset forms
