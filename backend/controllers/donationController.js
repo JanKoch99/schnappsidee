@@ -159,27 +159,56 @@ const updateDonation = async (req,res) =>{
             const slackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${victim}`;
             const slackApiToken = process.env.SLACK_API_TOKEN;
 
-            const response = await axios.get(slackApiUrl, {
+            const responseVictim = await axios.get(slackApiUrl, {
                 headers: {
                     'Authorization': `Bearer ${slackApiToken}`
                 }
             })
 
-            if (!response.data.ok) {
-                return res.status(400).send(response.data)
+            if (!responseVictim.data.ok) {
+                return res.status(400).send(responseVictim.data)
             }
-            const userID = response.data.user.id
+            const victimUserID = responseVictim.data.user.id
             await axios.post(process.env.WEBHOOK, {
                 "blocks": [
                     {
                         "type": "section",
                         "text": {
                             "type": "mrkdwn",
-                            "text": `Hey <@${userID}>,\nyou have been offered a drink by ${perpetrator}. Earn your drink now by simply completing a challenge at <https://veracalma.ch/|VeraCalma> at the <https://maps.app.goo.gl/M6paQkdfdJ1EE9Y77|following address>.`
+                            "text": `Hey <@${victimUserID}>,\nyou have been offered a drink by ${perpetrator}. Earn your drink now by simply completing a challenge at <https://veracalma.ch/|VeraCalma> at the <https://maps.app.goo.gl/M6paQkdfdJ1EE9Y77|following address>.`
                         }
                     },
                 ]
             });
+
+
+            if (isValidEmail(contactInfo)) {
+                const perpetratorSlackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${contactInfo}`;
+
+                const perpetratorResponse = await axios.get(perpetratorSlackApiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${slackApiToken}`
+                    }
+                })
+
+                if (!perpetratorResponse.data.ok) {
+                    return res.status(400).send(perpetratorResponse.data)
+                }
+                const perpetratorUserId = perpetratorResponse.data.user.id
+                await axios.post(process.env.WEBHOOK, {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": `Hey <@${perpetratorUserId}>,\nYour challenge has been submitted and we are waiting on <@${victimUserID}> to accept it.`
+                            }
+                        },
+                    ]
+                });
+            }
+
+
 
         } catch (error) {
                 console.error('Error sending message:', error);
@@ -214,6 +243,31 @@ const updateDonation = async (req,res) =>{
                 ]
             });
 
+            if (isValidEmail(contactInfo)) {
+                const perpetratorSlackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${contactInfo}`;
+                const perpetratorResponse = await axios.get(perpetratorSlackApiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${slackApiToken}`
+                    }
+                })
+
+                if (!perpetratorResponse.data.ok) {
+                    return res.status(400).send(perpetratorResponse.data)
+                }
+                const perpetratorUserID = perpetratorResponse.data.user.id
+                await axios.post(process.env.WEBHOOK, {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": `<@${perpetratorUserID}>\nyour victim has successfully finished a challenge!`
+                            }
+                        },
+                    ]
+                });
+            }
+
         } catch (error) {
             console.error('Error sending message:', error);
             res.status(500).send('Internal Server Error');
@@ -247,6 +301,31 @@ const updateDonation = async (req,res) =>{
                 ]
             });
 
+            if (isValidEmail(contactInfo)) {
+                const perpetratorSlackApiUrl = `https://slack.com/api/users.lookupByEmail?email=${contactInfo}`;
+                const perpetratorResponse = await axios.get(perpetratorSlackApiUrl, {
+                    headers: {
+                        'Authorization': `Bearer ${slackApiToken}`
+                    }
+                })
+
+                if (!perpetratorResponse.data.ok) {
+                    return res.status(400).send(perpetratorResponse.data)
+                }
+                const perpetratorUserID = perpetratorResponse.data.user.id
+                await axios.post(process.env.WEBHOOK, {
+                    "blocks": [
+                        {
+                            "type": "section",
+                            "text": {
+                                "type": "mrkdwn",
+                                "text": `<@${perpetratorUserID}>\nyour victim has chickened out :chicken:!`
+                            }
+                        },
+                    ]
+                });
+            }
+
         } catch (error) {
             console.error('Error sending message:', error);
             res.status(500).send('Internal Server Error');
@@ -255,6 +334,11 @@ const updateDonation = async (req,res) =>{
 
     req.broadcastEventById(formattedDonation._id, formattedDonation)
     res.status(200).json(formattedDonation)
+}
+
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
 
 

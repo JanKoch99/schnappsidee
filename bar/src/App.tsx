@@ -74,13 +74,13 @@ function App() {
   }, [donations])
 
 
-    const eventSource = new EventSource(`${URL}/events`);
+    /*const eventSource = new EventSource(`${URL}/events`);
     eventSource.onmessage = function (event) {
         const newDonation = JSON.parse(event.data);
         const donationArray: Donation[] = [...donations, newDonation]
         setDonations(donationArray);
         triggerConfetti("");
-    }
+    }*/
 
   const updateDonation = async (donation: Donation, taskState: string) => {
       donation.taskState = taskState;
